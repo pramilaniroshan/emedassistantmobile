@@ -1,5 +1,5 @@
-import 'package:emedassistantmobile/colors.dart';
-import 'package:emedassistantmobile/constants.dart';
+import 'package:emedassistantmobile/config/colors.dart';
+import 'package:emedassistantmobile/config/constants.dart';
 import 'package:emedassistantmobile/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
