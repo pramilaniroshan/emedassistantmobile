@@ -9,6 +9,21 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+
+  String _email = '';
+  int _phone_number = 0;
+
+  final _formKey = GlobalKey<FormState>();
+
+  Widget _buildEmailField () {
+    return TextField(
+      decoration: const InputDecoration(
+        labelText: "Email"
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +45,7 @@ class _SignInScreenState extends State<SignInScreen> {
                margin: EdgeInsets.all(0),
             ),
            ListTile(
-              trailing: Icon(Icons.more_vert),
+              leading: Icon(Icons.more_vert),
               title: const Text('Item 1'),
               onTap: () {
                 // Update the state of the app
@@ -40,7 +55,7 @@ class _SignInScreenState extends State<SignInScreen> {
               },
             ),
             ListTile(
-              trailing: Icon(Icons.more_vert),
+              leading: Icon(Icons.more_vert),
               title: const Text('Item 1'),
               onTap: () {
                 // Update the state of the app
@@ -50,7 +65,7 @@ class _SignInScreenState extends State<SignInScreen> {
               },
             ),
             ListTile(
-              trailing: Icon(Icons.more_vert),
+              leading: Icon(Icons.more_vert),
               title: const Text('Item 1'),
               onTap: () {
                 // Update the state of the app
@@ -84,6 +99,38 @@ class _SignInScreenState extends State<SignInScreen> {
                  ],
                ),
              ),
+             Row(
+               children: [
+                 Container(
+                   height: 200,
+                   padding: const EdgeInsets.all(10.0),
+                   decoration: new BoxDecoration(
+                   color: AppColors.lightBackground,
+                    ) ,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text('Welcome to eMed Assistant',
+                        style: TextStyle(
+                          color: AppColors.lightBlack,
+                          fontSize: 15
+                        ),),
+                        Text('Sign In',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold
+                        ),),
+                        Form(child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                           children: [
+                            
+                           ],
+                        ))
+                      ],
+                    ),
+                 ),
+               ],
+             )
            ],
            ),
     );
