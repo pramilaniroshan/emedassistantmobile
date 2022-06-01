@@ -1,7 +1,15 @@
+import 'dart:math';
+
+import 'package:emedassistantmobile/models/test_model.dart';
+import 'package:emedassistantmobile/screens/doctor_appointment/doctor_appointment_screen.dart';
+import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
+import 'package:emedassistantmobile/screens/profile/create_profile_screen.dart';
+import 'package:emedassistantmobile/screens/profile_setup/setup_one_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:form_validator/form_validator.dart';
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
@@ -10,6 +18,7 @@ import 'package:emedassistantmobile/widgets/custom_button.dart';
 import 'package:emedassistantmobile/widgets/custom_field.dart';
 //import 'package:emedassistantmobile/screens/profile_setup/setup_one_screen.dart';
 import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
+import 'package:dio/dio.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -24,7 +33,91 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController smsController = TextEditingController();
   TextEditingController codeController = TextEditingController();
 
+  bool isemailtab= true;
+
+  final List<Posts> posts = [];
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
+  final _otpFormKey = GlobalKey<FormState>();
+
+
+//    void get_posts () {
+//    var dio = Dio();
+//    dio.get('https://jsonplaceholder.typicode.com/posts',).then((res) {
+//      var ress = res.data;
+//      for (var item in ress){
+//        posts.add(Posts.fromJson(item));
+//        print(posts[0].title);
+//      }
+//    });
+//    //print(response);
+//  }
+
+  Future <void> login(double width) async{
+      try{
+   var dio = Dio();
+   await dio.post('https://localhost:5001/api/v1/Authentication/Login-init',data: {
+  "Username": emailController.text,
+  "UserLoginType": isemailtab ? 0 : 1,
+  "CountryCode": 210,
+  "Application": 0
+  }).then((res) {
+  if (res.statusCode == 200) {
+    Get.defaultDialog(
+                        backgroundColor: AppColors.lightBackground,
+                        radius: 2.0,
+                        title: '',
+                        content: bottomSheetColumn(width),
+                      );
+  }else if (res.statusCode == 400) {
+    print(res.statusCode);
+  }
+  // else if (res.statusCode == 400) {
+  //   print('gyhghgh');
+  // }
+    // print(res.data);
+     //return res.statusCode;
+   });
+      }catch(e){
+print(e);
+      }
+
+   //print(response);
+ }
+
+  int otp() {
+   var dio = Dio();
+   dio.post('https://localhost:5001/api/v1/Authentication/Login',data: {
+  "UserName": emailController.text,
+  "Otp": codeController.text,
+  "DeviceId": "210"
+}).then((res) {
+  if (res.statusCode == 200) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Done Logged In')),
+      );
+   Get.to(MyAppointmentsScreen());
+  }
+  else if (res.statusCode == 400) {
+    print('error');
+  }
+     print(res.data);
+     return res.statusCode;
+   }).onError((error, stackTrace) {
+      print(stackTrace);
+   });
+   return 0;
+   //print(response);
+ }
+
+ @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // get_posts ();
+    print(isemailtab);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       endDrawer: Drawer(
+        
         backgroundColor: AppColors.white,
         elevation: 0.0,
         child: Column(
@@ -77,6 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 13.0,
                     fit: BoxFit.scaleDown,
                     color: AppColors.secondary,
+                    
                 ),
               ),
               title: const Align(
@@ -189,116 +284,157 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Image.asset(AppImages.homeImage),
-            const SizedBox(height: 12.0),
-            const Padding(
-              padding: EdgeInsets.only(left: 16.0),
-              child: Text('Welcome to eMed Assistant',
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.w400,
-                color: AppColors.lightBlack,
-              ),
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            emailSMSRow(),
-            const SizedBox(height: 8.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: CustomField(
-                height: 50.0,
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                padding: const EdgeInsets.only(bottom: 0.0, left: 16.0),
-                hintText: 'Your email',
-              ),
-            ),
-            const SizedBox(height: 12.0),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CustomButton(
-                    onTap: (){
-                      Get.defaultDialog(
-                        backgroundColor: AppColors.lightBackground,
-                        radius: 2.0,
-                        title: '',
-                        content: bottomSheetColumn(width),
-                      );
-                    },
-                    btnText: 'Submit',
-                    width: 80.0,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            const Padding(
-              padding: EdgeInsets.only(left: 16.0),
-              child: Text('Don\'t have an account yet?',
+        child: Form(
+           key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              
+              Image.asset(AppImages.homeImage),
+              const SizedBox(height: 12.0),
+              const Padding(
+                padding: EdgeInsets.only(left: 16.0),
+                child: Text('Welcome to eMed Assistant',
                 style: TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.black,
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.lightBlack,
+                ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12.0),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Text('Join now as',
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.black,
+              const SizedBox(height: 10.0),
+              emailSMSRow(),
+              const SizedBox(height: 8.0),
+              
+              isemailtab ? 
+              Padding(
+                
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: CustomField(
+                  validator: isemailtab ? ValidationBuilder().email().maxLength(50).build() : ValidationBuilder().phone().maxLength(50).build(),
+                  height: 50.0,
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  padding: const EdgeInsets.only(bottom: 0.0, left: 16.0),
+                  hintText: 'Your email',
+                  
+                ),
+              ) : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: CustomField(
+                  height: 50.0,
+                  validator: isemailtab ? ValidationBuilder().email().maxLength(50).build() : ValidationBuilder().phone().maxLength(50).build(),
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  padding: const EdgeInsets.only(bottom: 0.0, left: 16.0),
+                  hintText: 'Your phone number',
+                ),
+              ) ,
+              const SizedBox(height: 12.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    CustomButton(
+                      onTap: (){
+                        // if(emailController.text!=null){
+                        //     login(width);
+        
+                        // } 
+                          if (_formKey.currentState!.validate()) {
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Processing Data')),
+      );
+      login(width);
+      }
+                        
+                      },
+                      btnText: 'Submit',
+                      width: 80.0,
                     ),
-                  ),
-                  const SizedBox(width: 8.0),
-                  CustomButton(
-                    onTap: (){},
-                    btnText: 'Doctor',
-                    width: 80.0,
-                    btnColor: AppColors.white,
-                    fontColor: AppColors.secondary,
-                    borderColor: AppColors.secondary,
-                  ),
-                  const SizedBox(width: 8.0),
-                  const Text('or',
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.black,
-                    ),
-                  ),
-                  const SizedBox(width: 8.0),
-                  CustomButton(
-                    onTap: (){},
-                    btnText: 'Patient',
-                    width: 80.0,
-                    btnColor: AppColors.white,
-                    fontColor: AppColors.secondary,
-                    borderColor: AppColors.secondary,
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16.0),
+              const Padding(
+                padding: EdgeInsets.only(left: 16.0),
+                child: Text('Don\'t have an account yet?',
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.black,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12.0),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Text('Join now as',
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    CustomButton(
+                      onTap: (){},
+                      btnText: 'Doctor',
+                      width: 80.0,
+                      btnColor: AppColors.white,
+                      fontColor: AppColors.secondary,
+                      borderColor: AppColors.secondary,
+                    ),
+                    const SizedBox(width: 8.0),
+                    const Text('or',
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
+                    CustomButton(
+                      onTap: (){
+                         Get.to(CreateProfileScreen());
+                      },
+                      btnText: 'Patient',
+                      width: 80.0,
+                      btnColor: AppColors.white,
+                      fontColor: AppColors.secondary,
+                      borderColor: AppColors.secondary,
+                    ),
+                   // test();
+                  ],
+                ),
+              ),
+              
+            ],
+          ),
         ),
       ),
+      
     );
   }
+
+
+
+  // Future<test_model>  () {
+
+  // print('heloo!');
+  // var dio = Dio();
+  // final response =  dio.get('https://google.com');
+  // print(response.data);
+  // }
 
   Widget menuButton() => TextButton(
     onPressed: (){
@@ -417,7 +553,12 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Bounceable(
-              onTap: (){},
+              onTap: (){
+                setState(() {
+                  isemailtab = true;
+                });
+                print(isemailtab);
+              },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                 decoration: BoxDecoration(
@@ -426,7 +567,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     bottomLeft: Radius.circular(8.0),
                   ),
                   border: Border.all(
-                    color: AppColors.secondary,
+                    color: isemailtab ? AppColors.secondary : AppColors.primary,
                     width: 1.5,
                   ),
                 ),
@@ -440,7 +581,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Bounceable(
-              onTap: (){},
+              onTap: (){
+                setState(() {
+                  isemailtab = false;
+                });
+              },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
                 decoration: BoxDecoration(
@@ -449,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     bottomRight: Radius.circular(8.0),
                   ),
                   border: Border.all(
-                    color: AppColors.primary,
+                    color: isemailtab ? AppColors.primary : AppColors.secondary,
                     width: 1.5,
                   ),
                 ),
@@ -478,86 +623,104 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 10.0),
           SvgPicture.asset(AppImages.termsIcon, height: 20.0, width: 20.0),
           const SizedBox(width: 10.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Text('Authentication',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 14.0),
-                const Text('We have sent you the access code',
-                  style: TextStyle(
-                    fontSize: 13.0,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-                const SizedBox(height: 14.0),
-                const Text('Attention, the code will expire in 5',
-                  style: TextStyle(
-                    fontSize: 13.0,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Container(
-                  height: 35.0,
-                  width: width,
-                  margin: const EdgeInsets.only(right: 16.0, top: 8.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3.0),
-                    border: Border.all(
-                      color: AppColors.primary,
-                      width: 1.5,
+          Form(
+            key: _otpFormKey,
+            child: Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Text('Authentication',
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: AppColors.black,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  child: TextFormField(
-                    controller: codeController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'code',
-                      contentPadding: EdgeInsets.only(left: 16.0, bottom: 16.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomButton(
-                        onTap: (){
-                         // Get.to(ProfileSetupOneScreen());
-                          Get.to(ScanQrScreen());
-                        },
-                        btnText: 'Submit',
-                        width: 80.0,
-                      ),
-                    ],
-                  ),
-                ),
-                TextButton(
-                  onPressed: (){},
-                  child: const Text('Send me again the verification code',
+                  const SizedBox(height: 14.0),
+                  const Text('We have sent you the access code',
                     style: TextStyle(
                       fontSize: 13.0,
-                      color: AppColors.secondary,
-                      fontWeight: FontWeight.w600,
-                      fontStyle: FontStyle.normal,
-                      decoration: TextDecoration.underline,
+                      color: AppColors.black,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 14.0),
+                  const Text('Attention, the code will expire in 5',
+                    style: TextStyle(
+                      fontSize: 13.0,
+                      color: AppColors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Container(
+                    height: 35.0,
+                    width: width,
+                    margin: const EdgeInsets.only(right: 16.0, top: 8.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3.0),
+                      border: Border.all(
+                        color: AppColors.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: TextFormField(
+                      controller: codeController,
+                      validator: ValidationBuilder().build(),
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'code',
+                        contentPadding: EdgeInsets.only(left: 16.0, bottom: 16.0),
+                        errorStyle: TextStyle(
+      fontSize: 16.0,
+    ),
+                      ),
+                      
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CustomButton(
+                          onTap: (){
+                           // Get.to(ProfileSetupOneScreen());
+                           if (_otpFormKey.currentState!.validate()) {
+      // If the form is valid, display a snackbar. In the real world,
+      // you'd often call a server or save the information in a database.
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Processing Data')),
+      );
+      var statuscode = otp();
+      }
+                           
+                            
+                          },
+                          btnText: 'Submit',
+                          width: 80.0,
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: (){},
+                    child: const Text('Send me again the verification code',
+                      style: TextStyle(
+                        fontSize: 13.0,
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.normal,
+                        decoration: TextDecoration.underline, 
+                      ),
+                      
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

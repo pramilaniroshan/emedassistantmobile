@@ -2,10 +2,15 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 import 'package:emedassistantmobile/screens/doctor_appointment/doctor_appointment_screen.dart';
+import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:emedassistantmobile/widgets/custom_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:dio/dio.dart';
+import 'package:emedassistantmobile/widgets/custom_button.dart';
+import 'package:emedassistantmobile/widgets/custom_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateProfileScreen extends StatefulWidget {
   const CreateProfileScreen({Key? key}) : super(key: key);
@@ -16,22 +21,91 @@ class CreateProfileScreen extends StatefulWidget {
 
 class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
+
   TextEditingController nameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController mobileNumberController = TextEditingController();
   TextEditingController addressController = TextEditingController();
+  TextEditingController codeController = TextEditingController();
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  String? selectedValue;
+  String? title;
   List<String> items = [
-    '15 minutes',
-    '1 hour',
-    '4 hours',
-    '24 hours',
+    'Mr',
+    'Mrs'
   ];
 
+String? cCode;
+  List<String> cCodes = [
+    '+94',
+    '+91'
+  ];
+
+  Future <void> sh() async{
+SharedPreferences prefs = await SharedPreferences.getInstance();
+prefs.setString('counter', "yes");
+print(prefs.getString('counter'));
+  }
+
+    int user_reg(double width) {
+   var dio = Dio();
+   dio.post('https://localhost:5001/api/v1/Registration/Patient',data: {
+  "Title": "Mr",
+  "FirstName": nameController.text,
+  "LastName": lastNameController.text,
+  "Email": emailController.text,
+  "PhoneNumber": "+94" + mobileNumberController.text,
+  "RegisterType": 0,
+  "CountryCode": 210,
+  "Address": addressController.text
+}).then((res) {
+  if (res.statusCode == 200) {
+   Get.defaultDialog(
+                        backgroundColor: AppColors.lightBackground,
+                        radius: 2.0,
+                        title: '',
+                        content: bottomSheetColumn(width),
+                        
+                      );
+  }
+     print(res.statusCode);
+     return res.statusCode;
+   }).onError((error, stackTrace) {
+
+print(error);
+
+   });
+   return 0;
+   //print(response);
+ }
+
+  int otp() {
+   var dio = Dio();
+   dio.post('https://localhost:5001/api/v1/Authentication/Login',data: {
+  "UserName": emailController.text,
+  "Otp": codeController.text,
+  "DeviceId": "210"
+}).then((res) {
+  if (res.statusCode == 200) {
+   Get.to(MyAppointmentsScreen());
+  }
+     print(res.data);
+     return res.statusCode;
+   }).onError((error, stackTrace) => null);
+   return 0;
+   //print(response);
+ }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    print(title);
+    sh();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -251,7 +325,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       child: DropdownButton2(
                         icon: const Icon(Icons.keyboard_arrow_down),
                         hint: const Text(
-                          '15 minutes', style: TextStyle(
+                          'Mr', style: TextStyle(
                           fontSize: 13.0,
                           color: AppColors.lightBlack,
                           fontWeight: FontWeight.w500,
@@ -269,10 +343,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           ),
                         ),)
                             .toList(),
-                        value: selectedValue,
-                        onChanged: (value) {
+                        
+                        onChanged: (String? newValue) {
+                          print(title);
                           setState(() {
-                            selectedValue = value as String;
+                            title = newValue;
                           });
                         },
                         buttonHeight: 40,
@@ -417,13 +492,13 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                 child: DropdownButton2(
                                   icon: const Icon(Icons.keyboard_arrow_down),
                                   hint: const Text(
-                                    '15 minutes', style: TextStyle(
+                                    '+94', style: TextStyle(
                                     fontSize: 13.0,
                                     color: AppColors.lightBlack,
                                     fontWeight: FontWeight.w500,
                                   ),
                                   ),
-                                  items: items.map((item) => DropdownMenuItem<String>(
+                                  items: cCodes.map((item) => DropdownMenuItem<String>(
                                     value: item,
                                     child: Text(
                                       item,
@@ -435,10 +510,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                     ),
                                   ),)
                                       .toList(),
-                                  value: selectedValue,
+                                  value: cCode,
                                   onChanged: (value) {
                                     setState(() {
-                                      selectedValue = value as String;
+                                      cCode = value as String;
                                     });
                                   },
                                   buttonHeight: 40,
@@ -519,6 +594,31 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     keyboardType: TextInputType.streetAddress,
                     width: width,
                   ),
+                  const SizedBox(height: 12.0),
+                  Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CustomButton(
+                    onTap: (){
+                      user_reg(width);
+                        //test(width);
+                      //   Get.defaultDialog(
+                      //   backgroundColor: AppColors.lightBackground,
+                      //   radius: 2.0,
+                      //   title: '',
+                      //   content: bottomSheetColumn(width),
+                        
+                      // );
+                    },
+                    btnText: 'Submit',
+                    width: 80.0,
+                  ),
+                ],
+              ),
+            ),
                 ],
               ),
             ),
@@ -571,4 +671,101 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     ),
   );
 
+ Widget bottomSheetColumn(width) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisAlignment: MainAxisAlignment.start,
+    children: [
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(width: 10.0),
+          //SvgPicture.asset(AppImages.termsIcon, height: 20.0, width: 20.0),
+          //const SizedBox(width: 10.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const Text('Thanks for your \nregistration.',
+                  style: TextStyle(
+                    fontSize: 30.0,
+                    color: AppColors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 14.0),
+                const Text('We have just sent you via email and SMS the temporary code to access.Please check your inbox or mobile phone and sign in.',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: AppColors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 18.0),
+                const Text('Attention, the code will expire in 5',
+                  style: TextStyle(
+                    fontSize: 13.0,
+                    color: AppColors.black,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Container(
+                  height: 35.0,
+                  width: width,
+                  margin: const EdgeInsets.only(right: 16.0, top: 8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3.0),
+                    border: Border.all(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: TextFormField(
+                    controller: codeController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'code',
+                      contentPadding: EdgeInsets.only(left: 16.0, bottom: 16.0),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CustomButton(
+                        onTap: (){
+                         // Get.to(ProfileSetupOneScreen());
+                         var statuscode = otp();
+                          
+                        },
+                        btnText: 'Submit',
+                        width: 80.0,
+                      ),
+                    ],
+                  ),
+                ),
+                TextButton(
+                  onPressed: (){},
+                  child: const Text('Send me again the verification code',
+                    style: TextStyle(
+                      fontSize: 13.0,
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.w600,
+                      fontStyle: FontStyle.normal,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
 }

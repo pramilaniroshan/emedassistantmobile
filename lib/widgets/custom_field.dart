@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form_validator/form_validator.dart';
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 
@@ -11,6 +12,7 @@ class CustomField extends StatelessWidget {
   final Widget? prefixIcon;
   final bool? isPrefixIcon;
   final String? hintText;
+  final FormFieldValidator<String> ? validator;
 
   const CustomField({Key? key,
     this.controller,
@@ -20,6 +22,7 @@ class CustomField extends StatelessWidget {
     this.prefixIcon,
     this.isPrefixIcon = false,
     this.padding,
+    this.validator,
     this.hintText = '',
 }) : super(key: key);
 
@@ -37,8 +40,10 @@ class CustomField extends StatelessWidget {
         borderRadius: BorderRadius.circular(5.0),
       ),
       child: TextFormField(
+        
         controller: controller,
         keyboardType: keyboardType,
+        validator: validator,
         decoration: InputDecoration(
           border: InputBorder.none,
           prefixIcon: isPrefixIcon! ? prefixIcon : null,
