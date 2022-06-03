@@ -3,6 +3,7 @@ import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/patient_booking_screen.dart';
 import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
+import 'package:emedassistantmobile/services/theme_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -49,10 +50,10 @@ class MyApp extends StatelessWidget {
       
       debugShowCheckedModeBanner: false,
       title: 'eMed App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Roboto',
-      ),
+      theme: Themes.light,
+      darkTheme: Themes.dark,
+      //themeMode: ThemeService().theme, 
+      
       //home: CreateProfileScreen(),
       home: AnimatedSplashScreen(
             duration: 3000,
@@ -63,4 +64,15 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.white));
   }
   
+}
+
+class Themes {
+  static final light = ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily: 'Roboto',
+      );
+  static final dark = ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily: 'Roboto',
+      );
 }
