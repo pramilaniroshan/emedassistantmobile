@@ -19,6 +19,8 @@ import 'package:emedassistantmobile/widgets/custom_field.dart';
 //import 'package:emedassistantmobile/screens/profile_setup/setup_one_screen.dart';
 import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
 import 'package:dio/dio.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -32,6 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController smsController = TextEditingController();
   TextEditingController codeController = TextEditingController();
+  late SharedPreferences prefs;
+  late bool user;
+   String error ="";
 
   bool isemailtab= true;
 
@@ -54,10 +59,55 @@ class _HomeScreenState extends State<HomeScreen> {
 //    //print(response);
 //  }
 
+void check_if_already_login() async {
+    prefs = await SharedPreferences.getInstance();
+    user = (prefs.getBool('login') ?? false);
+    print(prefs.getBool('login'));
+    if (user == true && user!=null) {
+      Get.to(MyAppointmentsScreen());
+    }
+  }
+
   Future <void> login(double width) async{
-      try{
-   var dio = Dio();
-   await dio.post('https://localhost:5001/api/v1/Authentication/Login-init',data: {
+  //     try{
+  //  var dio = Dio();
+  //  await dio.post('https://localhost:5001/api/v1/Authentication/Login-init',data: {
+  // "Username": emailController.text,
+  // "UserLoginType": isemailtab ? 0 : 1,
+  // "CountryCode": 210,
+  // "Application": 0
+  // }).then((res) {
+  // if (res.statusCode == 200) {
+  //   Get.defaultDialog(
+  //                       backgroundColor: AppColors.lightBackground,
+  //                       radius: 2.0,
+  //                       title: '',
+  //                       content: bottomSheetColumn(width),
+  //                     );
+  // }
+  // // }else if (res.statusCode == 400) {
+  // //   print(res.statusCode);
+  // // }
+  // // else if (res.statusCode == 400) {
+  // //   print('gyhghgh');
+  // // }
+  //   // print(res.data);
+  //    //return res.statusCode;
+  //  }).onError((error, stackTrace) {
+  //    print(error);
+  //  });
+
+
+  //     }catch(e){
+  //     print(e.toString());
+  //     }
+
+   //print(response);
+   //--------------------------------------------------//
+   try {
+  //404
+  var dio = Dio();
+  await dio.post('https://localhost:5001/api/v1/Authentication/Login-init',data: {
   "Username": emailController.text,
   "UserLoginType": isemailtab ? 0 : 1,
   "CountryCode": 210,
@@ -70,20 +120,31 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: '',
                         content: bottomSheetColumn(width),
                       );
-  }else if (res.statusCode == 400) {
-    print(res.statusCode);
+  }});
+} on DioError catch (e) {
+  // The request was made and the server responded with a status code
+  // that falls out of the range of 2xx and is also not 304.
+  if (e.response != null) {
+    var t = e.response!.data["Error"];
+    ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+          content: Text(t),
+         backgroundColor: AppColors.redColor,
+         ),
+      );
+    setState(() {
+      error = t;
+    });
+    print(t);
+    //print(e.response.data);
+   // print(e.response.headers);
+   // print(e.response.requestOptions);
+  } else {
+    // Something happened in setting up or sending the request that triggered an Error
+    print(e.requestOptions);
+    print(e.message);
   }
-  // else if (res.statusCode == 400) {
-  //   print('gyhghgh');
-  // }
-    // print(res.data);
-     //return res.statusCode;
-   });
-      }catch(e){
-print(e);
-      }
-
-   //print(response);
+}
  }
 
   int otp() {
@@ -92,12 +153,20 @@ print(e);
   "UserName": emailController.text,
   "Otp": codeController.text,
   "DeviceId": "210"
-}).then((res) {
+}).then((res) async{
   if (res.statusCode == 200) {
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Done Logged In')),
+        const SnackBar(
+          content: Text('Done Logged In'),
+          backgroundColor: Colors.green,
+          ),
       );
+      prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', "yes");
+      prefs.setString('refresh_token', "yes");
+      prefs.setBool('login', true);
    Get.to(MyAppointmentsScreen());
+   print(res.data);
   }
   else if (res.statusCode == 400) {
     print('error');
@@ -116,7 +185,17 @@ print(e);
     // TODO: implement initState
     super.initState();
     // get_posts ();
-    print(isemailtab);
+   // print(isemailtab);
+    check_if_already_login();
+  }
+
+   @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    emailController.dispose();
+    smsController.dispose();
+    codeController.dispose();
+    super.dispose();
   }
 
   @override
@@ -291,7 +370,10 @@ print(e);
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               
-              Image.asset(AppImages.homeImage),
+              Image.asset(AppImages.homeImage,
+              width: width,
+              fit: BoxFit.cover,
+              ),
               const SizedBox(height: 12.0),
               const Padding(
                 padding: EdgeInsets.only(left: 16.0),
@@ -308,18 +390,23 @@ print(e);
               const SizedBox(height: 8.0),
               
               isemailtab ? 
-              Padding(
-                
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: CustomField(
-                  validator: isemailtab ? ValidationBuilder().email().maxLength(50).build() : ValidationBuilder().phone().maxLength(50).build(),
-                  height: 50.0,
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  padding: const EdgeInsets.only(bottom: 0.0, left: 16.0),
-                  hintText: 'Your email',
-                  
-                ),
+              Column(
+                children: [
+                  Padding(
+                    
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: CustomField(
+                      validator: isemailtab ? ValidationBuilder().email().maxLength(50).build() : ValidationBuilder().phone().maxLength(50).build(),
+                      height: 50.0,
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      padding: const EdgeInsets.only(bottom: 0.0, left: 16.0),
+                      hintText: 'Your email',
+                      
+                    ),
+                  ),
+                  //error.isEmpty ? SizedBox() : Text("${error}"),
+                ],
               ) : Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: CustomField(
@@ -571,10 +658,10 @@ print(e);
                     width: 1.5,
                   ),
                 ),
-                child: const Text('Email',
+                child:  Text('Email',
                   style: TextStyle(
                     fontSize: 15.0,
-                    color: AppColors.secondary,
+                    color: isemailtab ? AppColors.secondary : AppColors.black,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -598,10 +685,10 @@ print(e);
                     width: 1.5,
                   ),
                 ),
-                child: const Text('SMS',
+                child:  Text('SMS',
                   style: TextStyle(
                     fontSize: 15.0,
-                    color: AppColors.black,
+                    color: isemailtab ? AppColors.black : AppColors.secondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

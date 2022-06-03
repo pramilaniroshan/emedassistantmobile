@@ -494,7 +494,7 @@ print(error);
                                   hint: const Text(
                                     '+94', style: TextStyle(
                                     fontSize: 13.0,
-                                    color: AppColors.lightBlack,
+                                    color: AppColors.redColor,
                                     fontWeight: FontWeight.w500,
                                   ),
                                   ),
@@ -504,7 +504,8 @@ print(error);
                                       item,
                                       style: const TextStyle(
                                         fontSize: 15.0,
-                                        color: Colors.white,
+                                        backgroundColor: Colors.red,
+                                        color: Colors.black45,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
