@@ -509,7 +509,7 @@ class _DoctorAppointmentScreenState extends State<DoctorAppointmentScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text('Mr. Salman Iqbal',
+            const Text('Mr. Pramila Niroshan',
               style: TextStyle(
                 fontSize: 20.0,
                 color: AppColors.black,

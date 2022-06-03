@@ -17,5 +17,5 @@ class AppImages {
   static const String arrivedIcon = 'assets/icons/button_arrived.svg';
   static const String backTopImage = 'assets/svgs/Group 185.png';
   static const String qrCodeImage = 'assets/svgs/qrcode.png';
-  static const String homeImage = 'assets/images/doctorImage.jpg';
+  static const String homeImage = 'assets/images/Home.jpg';
 }
