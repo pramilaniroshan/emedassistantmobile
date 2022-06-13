@@ -1,7 +1,12 @@
+import 'dart:io';
+
+import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 
 import 'package:emedassistantmobile/widgets/custom_button.dart';
 import 'package:emedassistantmobile/config/app_colors.dart';
@@ -35,6 +40,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
 
   bool isPlanned = true;
   bool isPast = false;
+  late SharedPreferences prefs;
 
   void planActive() {
     setState(() {
@@ -48,6 +54,34 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
       isPlanned = false;
       isPast = true;
     });
+  }
+
+  void searchDoctor() async{
+    print('Search Doctor');
+    prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? '';
+    print(token);
+try {
+  var dio = Dio();
+  dio.options.headers["authorization"] = "Bearer " + token;
+  await dio.get('https://localhost:5001/api/v1/Patient/SearchDoctor',
+  
+  ).then((res) {
+    print(res.data);
+  });
+} on DioError catch (e) {
+  // The request was made and the
+  // server responded with a status code
+  // that falls out of the range of 2xx and is also not 304.
+  print(e.response!.statusCode);
+  // if (e.response != null) {
+  //  // print(e);
+  // } else {
+  //   // Something happened in setting up or sending the request that triggered an Error
+  //   //print(e);
+  //   //print(e);
+  // }
+  }
   }
 
   @override
@@ -226,210 +260,210 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
 
             /// detail Box
             const SizedBox(height: 16.0),
-            Container(
-              width: width,
-              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-              margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: AppColors.lightBlue,
-                  width: 1.0,
-                ),
-                borderRadius: BorderRadius.circular(8.0),
-                color: AppColors.white,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
+            // Container(
+            //   width: width,
+            //   padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+            //   margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            //   decoration: BoxDecoration(
+            //     border: Border.all(
+            //       color: AppColors.lightBlue,
+            //       width: 1.0,
+            //     ),
+            //     borderRadius: BorderRadius.circular(8.0),
+            //     color: AppColors.white,
+            //   ),
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.start,
+            //     mainAxisAlignment: MainAxisAlignment.start,
+            //     children: [
 
-                  /// date and image row
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: const [
-                            Text('02 Jun 2022',
-                              style: TextStyle(
-                                fontSize: 14.0,
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            SizedBox(height: 4.0),
-                            Text('13:15',
-                              style: TextStyle(
-                                fontSize: 24.0,
-                                color: AppColors.black,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(height: 4.0),
-                            Text('16:15',
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const CircleAvatar(
-                        radius: 22.0,
-                        backgroundImage: AssetImage(AppImages.doctorImage),
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    thickness: 1.0,
-                    color: AppColors.primary.withOpacity(0.4),
-                  ),
+            //       /// date and image row
+            //       Row(
+            //         crossAxisAlignment: CrossAxisAlignment.center,
+            //         children: [
+            //           Expanded(
+            //             child: Column(
+            //               crossAxisAlignment: CrossAxisAlignment.start,
+            //               mainAxisAlignment: MainAxisAlignment.start,
+            //               children: const [
+            //                 Text('02 Jun 2022',
+            //                   style: TextStyle(
+            //                     fontSize: 14.0,
+            //                     color: AppColors.black,
+            //                     fontWeight: FontWeight.w500,
+            //                   ),
+            //                 ),
+            //                 SizedBox(height: 4.0),
+            //                 Text('13:15',
+            //                   style: TextStyle(
+            //                     fontSize: 24.0,
+            //                     color: AppColors.black,
+            //                     fontWeight: FontWeight.w600,
+            //                   ),
+            //                 ),
+            //                 SizedBox(height: 4.0),
+            //                 Text('16:15',
+            //                   style: TextStyle(
+            //                     fontSize: 20.0,
+            //                     color: AppColors.primary,
+            //                     fontWeight: FontWeight.w600,
+            //                   ),
+            //                 ),
+            //               ],
+            //             ),
+            //           ),
+            //           const CircleAvatar(
+            //             radius: 22.0,
+            //             backgroundImage: AssetImage(AppImages.doctorImage),
+            //           ),
+            //         ],
+            //       ),
+            //       Divider(
+            //         thickness: 1.0,
+            //         color: AppColors.primary.withOpacity(0.4),
+            //       ),
 
-                  /// name and specialists
-                  const SizedBox(height: 8.0),
-                  const Text('Doctor Name Doctor Name',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      color: AppColors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4.0),
-                  const Text('Dermatologists - Pediatricians',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: AppColors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+            //       /// name and specialists
+            //       const SizedBox(height: 8.0),
+            //       const Text('Doctor Name Doctor Name',
+            //         style: TextStyle(
+            //           fontSize: 24.0,
+            //           color: AppColors.black,
+            //           fontWeight: FontWeight.w500,
+            //         ),
+            //       ),
+            //       const SizedBox(height: 4.0),
+            //       const Text('Dermatologists - Pediatricians',
+            //         style: TextStyle(
+            //           fontSize: 12.0,
+            //           color: AppColors.black,
+            //           fontWeight: FontWeight.w500,
+            //         ),
+            //       ),
 
-                  /// location address center
-                  const SizedBox(height: 8.0),
-                  const Icon(Icons.location_on_outlined, color: AppColors.primary),
-                  const SizedBox(height: 2.0),
-                  RichText(
-                    text: const TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Colombo Center - ',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.black,
-                          ),
-                        ),
-                        TextSpan(
-                          text: 'Hospital St, Colombo 00100, Sri Lanka',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+            //       /// location address center
+            //       const SizedBox(height: 8.0),
+            //       const Icon(Icons.location_on_outlined, color: AppColors.primary),
+            //       const SizedBox(height: 2.0),
+            //       RichText(
+            //         text: const TextSpan(
+            //           children: [
+            //             TextSpan(
+            //               text: 'Colombo Center - ',
+            //               style: TextStyle(
+            //                 fontSize: 16.0,
+            //                 fontWeight: FontWeight.w600,
+            //                 color: AppColors.black,
+            //               ),
+            //             ),
+            //             TextSpan(
+            //               text: 'Hospital St, Colombo 00100, Sri Lanka',
+            //               style: TextStyle(
+            //                 fontSize: 14.0,
+            //                 fontWeight: FontWeight.w500,
+            //                 color: AppColors.black,
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //       ),
 
-                  /// brief description text
-                  const SizedBox(height: 16.0),
-                  const Text('Brief description of the purpose of the visit',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: AppColors.black,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 10.0),
-                  Divider(
-                    thickness: 1.0,
-                    color: AppColors.primary.withOpacity(0.4),
-                  ),
+            //       /// brief description text
+            //       const SizedBox(height: 16.0),
+            //       const Text('Brief description of the purpose of the visit',
+            //         style: TextStyle(
+            //           fontSize: 12.0,
+            //           color: AppColors.black,
+            //           fontWeight: FontWeight.w500,
+            //         ),
+            //       ),
+            //       const SizedBox(height: 10.0),
+            //       Divider(
+            //         thickness: 1.0,
+            //         color: AppColors.primary.withOpacity(0.4),
+            //       ),
 
-                  /// Calender and phone
-                  const SizedBox(height: 10.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Icon(Icons.calendar_today_outlined, color: AppColors.primary, size: 20.0),
-                      SizedBox(width: 8.0),
-                      Text('M567854',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          color: AppColors.black,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2.0),
-                    child: CustomButton(
-                      onTap: (){},
-                      btnText: 'Add to my calender',
-                      height: 30.0,
-                      width: MediaQuery.of(context).size.width / 3,
-                      fontSize: 13.0,
-                    ),
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Icon(Icons.phone, color: AppColors.primary, size: 20.0),
-                      SizedBox(width: 8.0),
-                      Text('+94 779012345',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          color: AppColors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10.0),
-                  Divider(
-                    thickness: 1.0,
-                    color: AppColors.primary.withOpacity(0.4),
-                  ),
+            //       /// Calender and phone
+            //       const SizedBox(height: 10.0),
+            //       Row(
+            //         crossAxisAlignment: CrossAxisAlignment.center,
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         children: const [
+            //           Icon(Icons.calendar_today_outlined, color: AppColors.primary, size: 20.0),
+            //           SizedBox(width: 8.0),
+            //           Text('M567854',
+            //             style: TextStyle(
+            //               fontSize: 20.0,
+            //               color: AppColors.black,
+            //               fontWeight: FontWeight.w600,
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //       Padding(
+            //         padding: const EdgeInsets.symmetric(vertical: 2.0),
+            //         child: CustomButton(
+            //           onTap: (){},
+            //           btnText: 'Add to my calender',
+            //           height: 30.0,
+            //           width: MediaQuery.of(context).size.width / 3,
+            //           fontSize: 13.0,
+            //         ),
+            //       ),
+            //       Row(
+            //         crossAxisAlignment: CrossAxisAlignment.center,
+            //         mainAxisAlignment: MainAxisAlignment.start,
+            //         children: const [
+            //           Icon(Icons.phone, color: AppColors.primary, size: 20.0),
+            //           SizedBox(width: 8.0),
+            //           Text('+94 779012345',
+            //             style: TextStyle(
+            //               fontSize: 16.0,
+            //               color: AppColors.black,
+            //               fontWeight: FontWeight.w500,
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //       const SizedBox(height: 10.0),
+            //       Divider(
+            //         thickness: 1.0,
+            //         color: AppColors.primary.withOpacity(0.4),
+            //       ),
 
-                  /// delete and edit button
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Container(
-                        height: 42.0,
-                        width: 42.0,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.secondary,
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.delete, color: AppColors.white, size: 18.0),
-                        ),
-                      ),
-                      const SizedBox(width: 16.0),
-                      Container(
-                        height: 42.0,
-                        width: 42.0,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.secondary,
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.edit, color: AppColors.white, size: 18.0),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            //       /// delete and edit button
+            //       Row(
+            //         crossAxisAlignment: CrossAxisAlignment.center,
+            //         mainAxisAlignment: MainAxisAlignment.end,
+            //         children: [
+            //           Container(
+            //             height: 42.0,
+            //             width: 42.0,
+            //             decoration: const BoxDecoration(
+            //               shape: BoxShape.circle,
+            //               color: AppColors.secondary,
+            //             ),
+            //             child: const Center(
+            //               child: Icon(Icons.delete, color: AppColors.white, size: 18.0),
+            //             ),
+            //           ),
+            //           const SizedBox(width: 16.0),
+            //           Container(
+            //             height: 42.0,
+            //             width: 42.0,
+            //             decoration: const BoxDecoration(
+            //               shape: BoxShape.circle,
+            //               color: AppColors.secondary,
+            //             ),
+            //             child: const Center(
+            //               child: Icon(Icons.edit, color: AppColors.white, size: 18.0),
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
 
             /// book and appointment button
@@ -483,7 +517,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
       ),
       const SizedBox(height: 20.0),
       ListTile(
-        onTap: () {},
+        onTap: () {
+          searchDoctor();
+        },
         leading: Padding(
           padding: const EdgeInsets.only(top: 6.0, left: 12.0),
           child: SvgPicture.asset(
@@ -555,7 +591,10 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
         ),
       ),
       ListTile(
-        onTap: () {},
+        onTap: () async {
+          prefs = await SharedPreferences.getInstance();
+          print(prefs.getString("token"));
+        },
         leading: Padding(
           padding: const EdgeInsets.only(top: 6.0, left: 12.0),
           child: SvgPicture.asset(
@@ -570,6 +609,41 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
           alignment: Alignment(-1.3, 0),
           child: Text(
             'eMed.com',
+            style: TextStyle(
+              fontSize: 21.0,
+              color: AppColors.black,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ),
+      SizedBox(height: height * 0.06),
+      ListTile(
+        onTap: () async{
+          prefs = await SharedPreferences.getInstance();
+          prefs.clear();
+          ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Logged out!'),
+          backgroundColor: AppColors.lightBlue,
+          ),
+      );
+          Get.to(HomeScreen());
+        },
+        leading: Padding(
+          padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+          child: SvgPicture.asset(
+            AppImages.linkIcon,
+            height: 13.0,
+            width: 13.0,
+            fit: BoxFit.scaleDown,
+            color: AppColors.secondary,
+          ),
+        ),
+        title: const Align(
+          alignment: Alignment(-1.3, 0),
+          child: Text(
+            ' Log out',
             style: TextStyle(
               fontSize: 21.0,
               color: AppColors.black,

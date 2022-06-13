@@ -61,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 void check_if_already_login() async {
     prefs = await SharedPreferences.getInstance();
+    
     user = (prefs.getBool('login') ?? false);
     print(prefs.getBool('login'));
     if (user == true && user!=null) {
@@ -161,12 +162,14 @@ void check_if_already_login() async {
           backgroundColor: Colors.green,
           ),
       );
+      final body = res.data["Data"];
+      //print(body["AccessToken"]);
       prefs = await SharedPreferences.getInstance();
-      prefs.setString('token', "yes");
+      prefs.setString('token', body["AccessToken"]);
       prefs.setString('refresh_token', "yes");
       prefs.setBool('login', true);
    Get.to(MyAppointmentsScreen());
-   print(res.data);
+   //print(res.data);
   }
   else if (res.statusCode == 400) {
     print('error');
