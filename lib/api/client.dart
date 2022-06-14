@@ -4,7 +4,7 @@ import 'package:logger/logger.dart';
 Logger logger = Logger();
 
 Dio client() {
-  Dio dio = new Dio();
+  Dio dio = Dio();
 
   dio.options.headers["Authorization"] = "some auth key";
 

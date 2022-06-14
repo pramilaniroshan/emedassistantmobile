@@ -1,10 +1,7 @@
-import 'dart:math';
 
 import 'package:emedassistantmobile/models/test_model.dart';
-import 'package:emedassistantmobile/screens/doctor_appointment/doctor_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/profile/create_profile_screen.dart';
-import 'package:emedassistantmobile/screens/profile_setup/setup_one_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/svg.dart';
@@ -17,9 +14,7 @@ import 'package:emedassistantmobile/widgets/clipper.dart';
 import 'package:emedassistantmobile/widgets/custom_button.dart';
 import 'package:emedassistantmobile/widgets/custom_field.dart';
 //import 'package:emedassistantmobile/screens/profile_setup/setup_one_screen.dart';
-import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
 import 'package:dio/dio.dart';
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -64,8 +59,8 @@ void check_if_already_login() async {
     
     user = (prefs.getBool('login') ?? false);
     print(prefs.getBool('login'));
-    if (user == true && user!=null) {
-      Get.to(MyAppointmentsScreen());
+    if (user == true) {
+      Get.to(const MyAppointmentsScreen());
     }
   }
 
@@ -168,7 +163,7 @@ void check_if_already_login() async {
       prefs.setString('token', body["AccessToken"]);
       prefs.setString('refresh_token', "yes");
       prefs.setBool('login', true);
-   Get.to(MyAppointmentsScreen());
+   Get.to(const MyAppointmentsScreen());
    //print(res.data);
   }
   else if (res.statusCode == 400) {
@@ -178,6 +173,7 @@ void check_if_already_login() async {
      return res.statusCode;
    }).onError((error, stackTrace) {
       print(stackTrace);
+      return null;
    });
    return 0;
    //print(response);
@@ -495,7 +491,7 @@ void check_if_already_login() async {
                     const SizedBox(width: 8.0),
                     CustomButton(
                       onTap: (){
-                         Get.to(CreateProfileScreen());
+                         Get.to(const CreateProfileScreen());
                       },
                       btnText: 'Patient',
                       width: 80.0,

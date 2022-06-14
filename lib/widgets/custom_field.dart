@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:form_validator/form_validator.dart';
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 

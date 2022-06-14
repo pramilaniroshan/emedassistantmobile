@@ -322,7 +322,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${myFormat.format(date)}',
+                            myFormat.format(date),
                             style: const TextStyle(
                               fontSize: 15.0,
                               fontWeight: FontWeight.w500,
@@ -420,7 +420,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
           const SizedBox(height: 20.0),
           ListTile(
             onTap: () {
-              Get.to(ScanQrScreen());
+              Get.to(const ScanQrScreen());
             },
             leading: Padding(
               padding: const EdgeInsets.only(top: 6.0, left: 12.0),
