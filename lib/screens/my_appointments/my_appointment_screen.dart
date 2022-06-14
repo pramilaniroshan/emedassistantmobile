@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
@@ -232,7 +231,7 @@ try {
                     flex: 2,
                     child: CustomButton(
                       onTap: (){
-                        Get.to(BookAnAppointmentScreen());
+                        Get.to(const BookAnAppointmentScreen());
                       },
                       width: 80.0,
                       borderColor: AppColors.lightBlue,
@@ -472,7 +471,7 @@ try {
               padding: EdgeInsets.symmetric(horizontal: height * 0.1),
               child: CustomButton(
                 onTap: (){
-                  Get.to(BookAnAppointmentScreen());
+                  Get.to(const BookAnAppointmentScreen());
                 },
                 borderColor: AppColors.lightBlue,
                 btnText: "Book an appointment",
@@ -628,7 +627,7 @@ try {
           backgroundColor: AppColors.lightBlue,
           ),
       );
-          Get.to(HomeScreen());
+          Get.to(const HomeScreen());
         },
         leading: Padding(
           padding: const EdgeInsets.only(top: 6.0, left: 12.0),

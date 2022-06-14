@@ -429,7 +429,7 @@ class _BillingScreenState extends State<BillingScreen> {
             /// frequently asked questions
             const SizedBox(height: 48.0),
             const Text('Frequently asked questions about eMed plans',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 26.0,
                 color: AppColors.black,
                 fontWeight: FontWeight.w500,

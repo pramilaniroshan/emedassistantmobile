@@ -9,7 +9,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:emedassistantmobile/widgets/custom_button.dart';
-import 'package:emedassistantmobile/widgets/custom_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateProfileScreen extends StatefulWidget {
@@ -76,6 +75,7 @@ print(prefs.getString('counter'));
    }).onError((error, stackTrace) {
 
 print(error);
+return null;
 
    });
    return 0;
@@ -90,7 +90,7 @@ print(error);
   "DeviceId": "210"
 }).then((res) {
   if (res.statusCode == 200) {
-   Get.to(MyAppointmentsScreen());
+   Get.to(const MyAppointmentsScreen());
   }
      print(res.data);
      return res.statusCode;
@@ -279,7 +279,7 @@ print(error);
               padding: const EdgeInsets.only(left: 16.0),
               child: GestureDetector(
                 onTap: (){
-                  Get.to(DoctorAppointmentScreen());
+                  Get.to(const DoctorAppointmentScreen());
                 },
                 child: const Text('Create your profile',
                 style: TextStyle(

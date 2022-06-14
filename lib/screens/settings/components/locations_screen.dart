@@ -2,7 +2,6 @@ import 'package:emedassistantmobile/screens/settings/components/widgets/map_box.
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';

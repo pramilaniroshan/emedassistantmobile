@@ -107,7 +107,7 @@ class _DoctorAvailabilityDialogState extends State<DoctorAvailabilityDialog>
                         child: RawScrollbar(
                           radius: const Radius.circular(8.0),
                           thumbColor: AppColors.secondary,
-                          isAlwaysShown: true,
+                          thumbVisibility: true,
                           child: SingleChildScrollView(
                             padding: const EdgeInsets.only(bottom: 20.0),
                             child: Padding(

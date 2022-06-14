@@ -2,7 +2,6 @@
 //
 //     final posts = postsFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 Posts postsFromJson(String str) => Posts.fromJson(json.decode(str));

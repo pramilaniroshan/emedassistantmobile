@@ -61,7 +61,7 @@ class _AppointmentDialogState extends State<AppointmentDialog> {
 
                       /// set the delay
                       const Text('Set the delay',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 15.0,
                         color: AppColors.lightBlack,
                         fontWeight: FontWeight.w500,
@@ -173,7 +173,7 @@ class _AppointmentDialogState extends State<AppointmentDialog> {
                     padding: const EdgeInsets.symmetric(vertical: 5.0),
                     child: CustomButton(
                       onTap: (){
-                        Get.to(SettingsScreen());
+                        Get.to(const SettingsScreen());
                       },
                       btnText: 'Publish',
                       width: 80.0,
