@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 
 import 'package:emedassistantmobile/config/app_colors.dart';
@@ -43,7 +44,10 @@ class SearchDoctorBox extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
 
-    //print(FreeSlots[0]);
+  var dateValue = new DateFormat("yyyy-MM-ddTHH:mm:ssZ").parseUTC(FreeSlots[0]).toLocal();
+String formattedDate = DateFormat("dd MMM yyyy hh:mm").format(dateValue);
+debugPrint("formattedDate = "+formattedDate);
+    print(FreeSlots[0]);
     return Container(
       width: width,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
