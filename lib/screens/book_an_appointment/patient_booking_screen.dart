@@ -3,27 +3,80 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 
 class PatientBookingScreen extends StatefulWidget {
-  const PatientBookingScreen({Key? key}) : super(key: key);
+
+   final String? timeSlotText;
+  final String id;
+  final int? consultationFee;
+  final String? doctorFullName;
+
+  const PatientBookingScreen(
+    this.timeSlotText,
+    this.consultationFee,
+    this.doctorFullName,
+    this.id,
+    {Key? key}) : super(key: key);
 
   @override
   State<PatientBookingScreen> createState() => _PatientBookingScreenState();
 }
+
+
 
 class _PatientBookingScreenState extends State<PatientBookingScreen> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController descController = TextEditingController();
+  late SharedPreferences prefs;
+
+
+  void makeApp() async {
+    print('Make App');
+    prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? '';
+    try {
+      var dio = Dio();
+      dio.options.headers["authorization"] = "Bearer " + token;
+      await dio.post(
+          'https://localhost:5001/api/v1/Patient/Appointment',data :
+        {
+  "DoctorAvailabilityId": widget.id,
+  "Time": widget.timeSlotText,
+  "PatientNotes": descController.text,
+} ).then((res) {
+            print(res.data);
+        setState(() {
+          
+        });
+        print(res.data);
+      });
+    } on DioError catch (e) {
+      // The request was made and the
+      // server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      print(e.response!.data);
+      // if (e.response != null) {
+      //  // print(e);
+      // } else {
+      //   // Something happened in setting up or sending the request that triggered an Error
+      //   //print(e);
+      //   //print(e);
+      // }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+    //String doctorFullName = '';
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.lightBackground,
@@ -128,8 +181,8 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,
-                          children: const [
-                            Text('Dr. Lorem Ipsum Name',
+                          children:  [
+                            Text(widget.doctorFullName ?? '',
                               style: TextStyle(
                                 fontSize: 24.0,
                                 fontWeight: FontWeight.bold,
@@ -178,7 +231,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               RichText(
-                                text: const TextSpan(
+                                text:  TextSpan(
                                   children: [
                                     TextSpan(
                                       text: 'Tuesday, ',
@@ -197,7 +250,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: '2022 \n5-7pm ',
+                                      text: widget.timeSlotText,
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -236,7 +289,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               RichText(
-                                text: const TextSpan(
+                                text:  TextSpan(
                                   children: [
                                     TextSpan(
                                       text: '\$ ',
@@ -247,7 +300,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: '30.00 ',
+                                      text: '${widget.consultationFee}',
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -376,7 +429,9 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                         ),
                         const SizedBox(width: 12.0),
                         CustomButton(
-                          onTap: (){},
+                          onTap: (){
+                            makeApp();
+                          },
                           btnText: 'Confirm',
                           width: 85.0,
                         ),
