@@ -6,6 +6,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
@@ -27,6 +29,10 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  late SharedPreferences prefs;
+
+  List doctorlist= [];
+
   String? selectedValue;
   List<String> items = [
     '15 minutes',
@@ -36,6 +42,49 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
   ];
 
   final Set<Marker> _markers = {};
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  void searchDoctor() async {
+    doctorlist.clear();
+    print('Search Doctor');
+    prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token") ?? '';
+    print(token);
+    try {
+      var dio = Dio();
+      dio.options.headers["authorization"] = "Bearer " + token;
+      await dio.get(
+          'https://localhost:5001/api/v1/Patient/SearchDoctorAvailability',
+          queryParameters: {"DoctorName": nameController.text}).then((res) {
+
+            var rdata = res.data['Data']['Data'];
+            for (var i in rdata) {
+              doctorlist.add(i);
+            }
+        setState(() {
+          
+        });
+        print(res.data);
+      });
+    } on DioError catch (e) {
+      // The request was made and the
+      // server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      print(e.response!.statusCode);
+      // if (e.response != null) {
+      //  // print(e);
+      // } else {
+      //   // Something happened in setting up or sending the request that triggered an Error
+      //   //print(e);
+      //   //print(e);
+      // }
+    }
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
@@ -48,14 +97,11 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
     });
   }
 
-
   final myFormat = DateFormat('yyyy-MM-dd');
   var date = DateTime.now();
 
-
   @override
   Widget build(BuildContext context) {
-
     Future<void> selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
           context: context,
@@ -90,6 +136,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
         child: endDrawerData(height),
       ),
       body: SingleChildScrollView(
+
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -150,21 +197,22 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                       controller: nameController,
                       keyboardType: TextInputType.name,
                       padding: const EdgeInsets.only(bottom: 12.0, left: 16.0),
-                      hintText: '',
+                      hintText: 'Doctor Name',
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 20.0, top: 8.0),
-                    child: Text(
-                      'Dr. Lorem Ipsum',
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.secondary,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
+                  // const Padding(
+                  //   padding: EdgeInsets.only(left: 20.0, top: 8.0),
+                  //   child: Text(
+
+                  //     '',
+                  //     style: TextStyle(
+                  //       fontSize: 16.0,
+                  //       fontWeight: FontWeight.w500,
+                  //       color: AppColors.secondary,
+
+                  //     ),
+                  //   ),
+                  // ),
 
                   /// doctor medical speciality dropdown
                   const SizedBox(height: 16.0),
@@ -330,11 +378,11 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                             ),
                           ),
                           InkWell(
-                              onTap: (){
-                                selectDate(context);
-                              },
-                              child: const Icon(Icons.calendar_today,
-                                  color: AppColors.primary, size: 20.0),
+                            onTap: () {
+                              selectDate(context);
+                            },
+                            child: const Icon(Icons.calendar_today,
+                                color: AppColors.primary, size: 20.0),
                           ),
                         ],
                       ),
@@ -345,13 +393,14 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                   const SizedBox(height: 32.0),
                   Center(
                     child: CustomButton(
-                      onTap: (){
+                      onTap: () {
+                        searchDoctor();
                         /*Get.dialog(
                           const ScheduleSlotDialog(),
                         );*/
-                        Get.dialog(
-                          const DoctorAvailabilityDialog(),
-                        );
+                        // Get.dialog(
+                        //   const DoctorAvailabilityDialog(),
+                        // );
                       },
                       btnText: 'Search',
                       width: 90.0,
@@ -362,10 +411,10 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
               ),
             ),
 
-
             /// Search Result List
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.25,
                 width: MediaQuery.of(context).size.width,
@@ -385,21 +434,34 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                 ),
               ),
             ),
-
+            doctorlist.isEmpty ? Center(child: CircularProgressIndicator()) :Column(
+              children: List.generate(doctorlist.length, (index) => SearchDoctorBox(doctorlist[index]["IanaTimeZoneId"],doctorlist[index]["Id"],doctorlist[index]["DoctorFullName"],doctorlist[index]["FreeSlots"],doctorlist[index]["ConsultationFee"]))
+            )
+            
             /// List of search items
-            const SearchDoctorBox(),
-            const SearchDoctorBox(),
-            const SearchDoctorBox(),
-            const SearchDoctorBox(),
-            const SearchDoctorBox(),
-
-            const SizedBox(height: 40.0),
-
+            //getDoctorList(doctorlist),
+            // ListView.builder(
+            //     padding: const EdgeInsets.all(8),
+            //     itemCount: doctorlist.length,
+            //     itemBuilder: (BuildContext context, int index) {
+            //       return Container(
+            //         height: 50,
+            //         color: Colors.amber,
+            //         child: Center(child: Text('Entry ${[index]}')),
+            //       );
+            //     }),
+            ///const SizedBox(height: 40.0),
+            
           ],
         ),
       ),
     );
   }
+
+  // Widget getDoctorList(List<String> strings)
+  // {
+  //   return new Row(children: children: list);
+  // }
 
   Widget endDrawerData(height) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -568,5 +630,4 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
           ],
         ),
       );
-
 }

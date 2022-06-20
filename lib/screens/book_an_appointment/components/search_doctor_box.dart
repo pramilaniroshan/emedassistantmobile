@@ -1,18 +1,49 @@
-import 'package:emedassistantmobile/screens/book_an_appointment/patient_booking_screen.dart';
+
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 import 'expand_dates.dart';
 
 class SearchDoctorBox extends StatelessWidget {
-  const SearchDoctorBox({Key? key}) : super(key: key);
+
+  final String index;
+  final String id;
+  // final String doctorProfileImage;
+  final String doctorFullName;
+  // final String doctorTitle;
+  // final String locationId;
+  // final String availabilityTemplateId;
+  // final String ianaTimeZoneId;
+  // final String startTime;
+  // final int maxAppointments;
+  // final int lastAppointmentNumber;
+  // final String avgTimeForPatient;
+  // final String endTime;
+  final int consultationFee;
+  // final bool isActive;
+  //final Array delays;
+  final List FreeSlots;
+
+   SearchDoctorBox(
+
+    this.index,
+    this.id,
+    this.doctorFullName,
+    this.FreeSlots,
+    this.consultationFee,
+    //this.doctorFullName,
+    {Key? key})  : super(key: key) ;
+   //SearchDoctorBox({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
+
+    //print(FreeSlots[0]);
     return Container(
       width: width,
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
@@ -35,7 +66,7 @@ class SearchDoctorBox extends StatelessWidget {
             elevation: 0.0,
             child: InkWell(
               onTap: (){
-                Get.to(const PatientBookingScreen());
+                
               },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
@@ -47,17 +78,17 @@ class SearchDoctorBox extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children: const [
-                          Text('Dr. Lorem Ipsum Name',
+                        children: [
+                          Text(doctorFullName,
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
                               color: AppColors.secondary,
-                              decoration: TextDecoration.underline,
+                              //decoration: TextDecoration.underline,
                             ),
                           ),
                           SizedBox(height: 6.0),
-                          Text('Lorem Ipsum - Lorem Ipsum',
+                          Text(id,
                             style: TextStyle(
                               fontSize: 15.0,
                               fontWeight: FontWeight.w500,
@@ -122,7 +153,7 @@ class SearchDoctorBox extends StatelessWidget {
           ),
 
           /// show/hide available dates
-          const ExpandDates(),
+            ExpandDates(FreeSlots,doctorFullName,id,consultationFee),
         ],
       ),
     );
