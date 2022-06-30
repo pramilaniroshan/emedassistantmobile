@@ -1,3 +1,4 @@
+import 'dart:convert';
 
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
@@ -11,6 +12,8 @@ import 'package:emedassistantmobile/widgets/custom_button.dart';
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 
+import '../../config/constants.dart';
+
 class MyAppointmentsScreen extends StatefulWidget {
   const MyAppointmentsScreen({Key? key}) : super(key: key);
 
@@ -19,15 +22,25 @@ class MyAppointmentsScreen extends StatefulWidget {
 }
 
 class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
-
   /// door rating dropdown items
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
       const DropdownMenuItem(
-          value: "All doctors", child: Text("All doctors"),),
-      const DropdownMenuItem(value: "Imesha", child: Text("Imesha"),),
-      const DropdownMenuItem(value: "Doctor 2", child: Text("Doctor 2"),),
-      const DropdownMenuItem(value: "Doctor 3", child: Text("Doctor 3"),),
+        value: "All doctors",
+        child: Text("All doctors"),
+      ),
+      const DropdownMenuItem(
+        value: "Imesha",
+        child: Text("Imesha"),
+      ),
+      const DropdownMenuItem(
+        value: "Doctor 2",
+        child: Text("Doctor 2"),
+      ),
+      const DropdownMenuItem(
+        value: "Doctor 3",
+        child: Text("Doctor 3"),
+      ),
       const DropdownMenuItem(value: "Doctor 4", child: Text("Doctor 4")),
     ];
     return menuItems;
@@ -55,32 +68,33 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     });
   }
 
-  void searchDoctor() async{
-    print('Search Doctor');
+  void searchDoctor() async {
     prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token") ?? '';
     print(token);
-try {
-  var dio = Dio();
-  dio.options.headers["authorization"] = "Bearer " + token;
-  await dio.get('https://localhost:5001/api/v1/Patient/SearchDoctor',
-  
-  ).then((res) {
-    print(res.data);
-  });
-} on DioError catch (e) {
-  // The request was made and the
-  // server responded with a status code
-  // that falls out of the range of 2xx and is also not 304.
-  print(e.response!.statusCode);
-  // if (e.response != null) {
-  //  // print(e);
-  // } else {
-  //   // Something happened in setting up or sending the request that triggered an Error
-  //   //print(e);
-  //   //print(e);
-  // }
-  }
+    try {
+      var dio = Dio();
+      dio.options.headers["authorization"] = "Bearer " + token;
+      await dio
+          .get(
+        Constants().getBaseUrl() + '/Patient/SearchDoctor',
+      )
+          .then((res) {
+        print(res.data);
+      });
+    } on DioError catch (e) {
+      // The request was made and the
+      // server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      print(e.response!.statusCode);
+      // if (e.response != null) {
+      //  // print(e);
+      // } else {
+      //   // Something happened in setting up or sending the request that triggered an Error
+      //   //print(e);
+      //   //print(e);
+      // }
+    }
   }
 
   @override
@@ -118,7 +132,6 @@ try {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-
             /// My Appointments texts
             const SizedBox(height: 24.0),
             const Padding(
@@ -144,12 +157,18 @@ try {
                   InkWell(
                     onTap: planActive,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                      child: Text('Planned',
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4.0),
+                      child: Text(
+                        'Planned',
                         style: TextStyle(
                           fontSize: 15.0,
-                          color: isPlanned == true ?  AppColors.black : AppColors.secondary,
-                          fontWeight: isPlanned == true ? FontWeight.w600 : FontWeight.w500,
+                          color: isPlanned == true
+                              ? AppColors.black
+                              : AppColors.secondary,
+                          fontWeight: isPlanned == true
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -157,12 +176,18 @@ try {
                   InkWell(
                     onTap: pastActive,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                      child: Text('Past',
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4.0),
+                      child: Text(
+                        'Past',
                         style: TextStyle(
                           fontSize: 15.0,
-                          color: isPast == true ?  AppColors.black : AppColors.secondary,
-                          fontWeight: isPast == true ? FontWeight.w600 : FontWeight.w500,
+                          color: isPast == true
+                              ? AppColors.black
+                              : AppColors.secondary,
+                          fontWeight: isPast == true
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -197,7 +222,8 @@ try {
                           fontSize: 14.0,
                         ),
                         underline: const SizedBox(),
-                        icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 20.0),
+                        icon: const Icon(Icons.keyboard_arrow_down,
+                            color: AppColors.primary, size: 20.0),
                         isExpanded: true,
                         onChanged: (String? value) {
                           setState(() {
@@ -219,18 +245,22 @@ try {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Planned',
+                  const Text(
+                    'Planned',
                     style: TextStyle(
                       fontSize: 24.0,
                       color: AppColors.black,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const Expanded(flex: 3,child: SizedBox(),),
+                  const Expanded(
+                    flex: 3,
+                    child: SizedBox(),
+                  ),
                   Expanded(
                     flex: 2,
                     child: CustomButton(
-                      onTap: (){
+                      onTap: () {
                         Get.to(const BookAnAppointmentScreen());
                       },
                       width: 80.0,
@@ -464,13 +494,12 @@ try {
             //   ),
             // ),
 
-
             /// book and appointment button
             const SizedBox(height: 24.0),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: height * 0.1),
               child: CustomButton(
-                onTap: (){
+                onTap: () {
                   Get.to(const BookAnAppointmentScreen());
                 },
                 borderColor: AppColors.lightBlue,
@@ -499,208 +528,208 @@ try {
   }
 
   Widget endDrawerData(height) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: [
-      const SizedBox(height: 40.0),
-      Align(
-        alignment: Alignment.bottomRight,
-        child: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: SvgPicture.asset(
-            AppImages.closeIcon,
-          ),
-        ),
-      ),
-      const SizedBox(height: 20.0),
-      ListTile(
-        onTap: () {
-          searchDoctor();
-        },
-        leading: Padding(
-          padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-          child: SvgPicture.asset(
-            AppImages.supportIcon,
-            height: 13.0,
-            width: 13.0,
-            fit: BoxFit.scaleDown,
-            color: AppColors.secondary,
-          ),
-        ),
-        title: const Align(
-          alignment: Alignment(-1.3, 0),
-          child: Text(
-            'Support',
-            style: TextStyle(
-              fontSize: 21.0,
-              color: AppColors.black,
-              fontWeight: FontWeight.w400,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          const SizedBox(height: 40.0),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: IconButton(
+              onPressed: () {
+                Get.back();
+              },
+              icon: SvgPicture.asset(
+                AppImages.closeIcon,
+              ),
             ),
           ),
-        ),
-      ),
-      ListTile(
-        onTap: () {},
-        leading: Padding(
-          padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-          child: SvgPicture.asset(
-            AppImages.contactIcon,
-            height: 13.0,
-            width: 13.0,
-            fit: BoxFit.scaleDown,
-            color: AppColors.secondary,
-          ),
-        ),
-        title: const Align(
-          alignment: Alignment(-1.3, 0),
-          child: Text(
-            'Contact',
-            style: TextStyle(
-              fontSize: 21.0,
-              color: AppColors.black,
-              fontWeight: FontWeight.w400,
+          const SizedBox(height: 20.0),
+          ListTile(
+            onTap: () {
+              searchDoctor();
+            },
+            leading: Padding(
+              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+              child: SvgPicture.asset(
+                AppImages.supportIcon,
+                height: 13.0,
+                width: 13.0,
+                fit: BoxFit.scaleDown,
+                color: AppColors.secondary,
+              ),
+            ),
+            title: const Align(
+              alignment: Alignment(-1.3, 0),
+              child: Text(
+                'Support',
+                style: TextStyle(
+                  fontSize: 21.0,
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      ListTile(
-        onTap: () {},
-        leading: Padding(
-          padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-          child: SvgPicture.asset(
-            AppImages.termsIcon,
-            height: 13.0,
-            width: 13.0,
-            fit: BoxFit.scaleDown,
-            color: AppColors.secondary,
-          ),
-        ),
-        title: const Align(
-          alignment: Alignment(-1.3, 0),
-          child: Text(
-            'Terms',
-            style: TextStyle(
-              fontSize: 21.0,
-              color: AppColors.black,
-              fontWeight: FontWeight.w400,
+          ListTile(
+            onTap: () {},
+            leading: Padding(
+              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+              child: SvgPicture.asset(
+                AppImages.contactIcon,
+                height: 13.0,
+                width: 13.0,
+                fit: BoxFit.scaleDown,
+                color: AppColors.secondary,
+              ),
+            ),
+            title: const Align(
+              alignment: Alignment(-1.3, 0),
+              child: Text(
+                'Contact',
+                style: TextStyle(
+                  fontSize: 21.0,
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      ListTile(
-        onTap: () async {
-          prefs = await SharedPreferences.getInstance();
-          print(prefs.getString("token"));
-        },
-        leading: Padding(
-          padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-          child: SvgPicture.asset(
-            AppImages.linkIcon,
-            height: 13.0,
-            width: 13.0,
-            fit: BoxFit.scaleDown,
-            color: AppColors.secondary,
-          ),
-        ),
-        title: const Align(
-          alignment: Alignment(-1.3, 0),
-          child: Text(
-            'eMed.com',
-            style: TextStyle(
-              fontSize: 21.0,
-              color: AppColors.black,
-              fontWeight: FontWeight.w400,
+          ListTile(
+            onTap: () {},
+            leading: Padding(
+              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+              child: SvgPicture.asset(
+                AppImages.termsIcon,
+                height: 13.0,
+                width: 13.0,
+                fit: BoxFit.scaleDown,
+                color: AppColors.secondary,
+              ),
+            ),
+            title: const Align(
+              alignment: Alignment(-1.3, 0),
+              child: Text(
+                'Terms',
+                style: TextStyle(
+                  fontSize: 21.0,
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      SizedBox(height: height * 0.06),
-      ListTile(
-        onTap: () async{
-          prefs = await SharedPreferences.getInstance();
-          prefs.clear();
-          ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Logged out!'),
-          backgroundColor: AppColors.lightBlue,
+          ListTile(
+            onTap: () async {
+              prefs = await SharedPreferences.getInstance();
+              print(prefs.getString("token"));
+            },
+            leading: Padding(
+              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+              child: SvgPicture.asset(
+                AppImages.linkIcon,
+                height: 13.0,
+                width: 13.0,
+                fit: BoxFit.scaleDown,
+                color: AppColors.secondary,
+              ),
+            ),
+            title: const Align(
+              alignment: Alignment(-1.3, 0),
+              child: Text(
+                'eMed.com',
+                style: TextStyle(
+                  fontSize: 21.0,
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
           ),
+          SizedBox(height: height * 0.06),
+          ListTile(
+            onTap: () async {
+              prefs = await SharedPreferences.getInstance();
+              prefs.clear();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Logged out!'),
+                  backgroundColor: AppColors.lightBlue,
+                ),
+              );
+              Get.to(const HomeScreen());
+            },
+            leading: Padding(
+              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+              child: SvgPicture.asset(
+                AppImages.linkIcon,
+                height: 13.0,
+                width: 13.0,
+                fit: BoxFit.scaleDown,
+                color: AppColors.secondary,
+              ),
+            ),
+            title: const Align(
+              alignment: Alignment(-1.3, 0),
+              child: Text(
+                ' Log out',
+                style: TextStyle(
+                  fontSize: 21.0,
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: height * 0.06),
+          ListTile(
+            onTap: () {},
+            leading: Padding(
+              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+              child: SvgPicture.asset(
+                AppImages.globeIcon,
+                height: 13.0,
+                width: 13.0,
+                fit: BoxFit.scaleDown,
+                color: AppColors.secondary,
+              ),
+            ),
+            title: const Align(
+              alignment: Alignment(-1.1, 0),
+              child: Text(
+                'English',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+            trailing: const Icon(Icons.keyboard_arrow_down_outlined,
+                color: AppColors.black),
+          ),
+        ],
       );
-          Get.to(const HomeScreen());
-        },
-        leading: Padding(
-          padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-          child: SvgPicture.asset(
-            AppImages.linkIcon,
-            height: 13.0,
-            width: 13.0,
-            fit: BoxFit.scaleDown,
-            color: AppColors.secondary,
-          ),
-        ),
-        title: const Align(
-          alignment: Alignment(-1.3, 0),
-          child: Text(
-            ' Log out',
-            style: TextStyle(
-              fontSize: 21.0,
-              color: AppColors.black,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ),
-      SizedBox(height: height * 0.06),
-      ListTile(
-        onTap: () {},
-        leading: Padding(
-          padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-          child: SvgPicture.asset(
-            AppImages.globeIcon,
-            height: 13.0,
-            width: 13.0,
-            fit: BoxFit.scaleDown,
-            color: AppColors.secondary,
-          ),
-        ),
-        title: const Align(
-          alignment: Alignment(-1.1, 0),
-          child: Text(
-            'English',
-            style: TextStyle(
-              fontSize: 16.0,
-              color: AppColors.black,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        trailing: const Icon(Icons.keyboard_arrow_down_outlined,
-            color: AppColors.black),
-      ),
-    ],
-  );
 
   Widget menuButton() => TextButton(
-    onPressed: () {
-      _scaffoldKey.currentState!.openEndDrawer();
-    },
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: const [
-        Text(
-          'Mrs.Imesha',
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w500,
-            color: AppColors.black,
-          ),
+        onPressed: () {
+          _scaffoldKey.currentState!.openEndDrawer();
+        },
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: const [
+            Text(
+              'Mrs.Imesha',
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                color: AppColors.black,
+              ),
+            ),
+            SizedBox(width: 12.0),
+            Icon(Icons.menu, color: AppColors.black, size: 28.0),
+            SizedBox(width: 12.0),
+          ],
         ),
-        SizedBox(width: 12.0),
-        Icon(Icons.menu, color: AppColors.black, size: 28.0),
-        SizedBox(width: 12.0),
-      ],
-    ),
-  );
+      );
 }
