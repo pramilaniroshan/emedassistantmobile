@@ -10,25 +10,41 @@ class DateRow extends StatelessWidget {
   final String? timeSlotText;
   final String id;
   final int? consultationFee;
+  final String? title;
   final String? doctorFullName;
+  final String locationName;
+  final String locationAddress;
 
-  const DateRow({Key? key,
-    this.dayText = 'Monday, ',
-    this.dateText = '11 Apr ',
-    this.timeSlotText = '2022 - 9-11am - 3\'slot ',
-    this.consultationFee = 0,
-    this.doctorFullName = 'name',
-    this.id = ''
-    
-}) : super(key: key);
+  const DateRow(
+      {Key? key,
+      this.dayText = ', ',
+      this.dateText = ' ',
+      this.timeSlotText = '',
+      this.consultationFee = 0,
+      this.title,
+      this.doctorFullName = '',
+      this.id = '',
+      this.locationName = '',
+      this.locationAddress = ''})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return GestureDetector(
-       onTap: () { Get.to( PatientBookingScreen(timeSlotText,consultationFee,doctorFullName,id)); },
+      onTap: () {
+        Get.to(PatientBookingScreen(
+            dayText,
+            dateText,
+            timeSlotText,
+            consultationFee,
+            title,
+            doctorFullName,
+            id,
+            locationName,
+            locationAddress));
+      },
       child: Container(
-        
         width: width,
         decoration: const BoxDecoration(
           border: Border(
@@ -55,16 +71,14 @@ class DateRow extends StatelessWidget {
                           fontSize: 13.0,
                           color: AppColors.black,
                           fontWeight: FontWeight.w400,
-                        )
-                    ),
+                        )),
                     TextSpan(
                         text: dateText,
                         style: const TextStyle(
                           fontSize: 13.0,
                           color: AppColors.black,
                           fontWeight: FontWeight.bold,
-                        )
-                    ),
+                        )),
                     TextSpan(
                         text: timeSlotText,
                         style: const TextStyle(
@@ -72,8 +86,7 @@ class DateRow extends StatelessWidget {
                           color: AppColors.black,
                           fontWeight: FontWeight.w400,
                           height: 1.3,
-                        )
-                    ),
+                        )),
                   ],
                 ),
               ),
@@ -86,8 +99,8 @@ class DateRow extends StatelessWidget {
                 color: AppColors.secondary,
               ),
               child: const Center(
-                child: Icon(Icons.calendar_today, color: AppColors.white, size: 18.0),
-                
+                child: Icon(Icons.calendar_today,
+                    color: AppColors.white, size: 18.0),
               ),
             ),
           ],

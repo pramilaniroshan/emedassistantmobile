@@ -1,20 +1,17 @@
-
-
 import 'package:flutter/material.dart';
-
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 import 'expand_dates.dart';
 
 class SearchDoctorBox extends StatelessWidget {
-
   final String index;
   final String id;
   // final String doctorProfileImage;
   final String doctorFullName;
-  // final String doctorTitle;
-  // final String locationId;
+  final String doctorTitle;
+  final String locationName;
+  final String locationAddress;
   // final String availabilityTemplateId;
   // final String ianaTimeZoneId;
   // final String startTime;
@@ -27,16 +24,19 @@ class SearchDoctorBox extends StatelessWidget {
   //final Array delays;
   final List FreeSlots;
 
-   SearchDoctorBox(
-
-    this.index,
-    this.id,
-    this.doctorFullName,
-    this.FreeSlots,
-    this.consultationFee,
-    //this.doctorFullName,
-    {Key? key})  : super(key: key) ;
-   //SearchDoctorBox({Key? key}) : super(key: key);
+  const SearchDoctorBox(
+      this.index,
+      this.id,
+      this.doctorTitle,
+      this.doctorFullName,
+      this.FreeSlots,
+      this.consultationFee,
+      this.locationName,
+      this.locationAddress,
+      //this.doctorFullName,
+      {Key? key})
+      : super(key: key);
+  //SearchDoctorBox({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -60,16 +60,14 @@ class SearchDoctorBox extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-
           /// Doctor name and image
           Material(
             elevation: 0.0,
             child: InkWell(
-              onTap: (){
-                
-              },
+              onTap: () {},
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -79,7 +77,8 @@ class SearchDoctorBox extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(doctorFullName,
+                          Text(
+                            doctorTitle + ' ' + doctorFullName,
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
@@ -88,7 +87,8 @@ class SearchDoctorBox extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 6.0),
-                          Text(id,
+                          Text(
+                            id,
                             style: TextStyle(
                               fontSize: 15.0,
                               fontWeight: FontWeight.w500,
@@ -120,16 +120,17 @@ class SearchDoctorBox extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(width: 8.0),
-              const Icon(Icons.location_on_outlined, color: AppColors.primary, size: 20.0),
+              const Icon(Icons.location_on_outlined,
+                  color: AppColors.primary, size: 20.0),
               const SizedBox(width: 5.0),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 4.0),
                   child: RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
                         TextSpan(
-                          text: 'Colombo Center ',
+                          text: locationName,
                           style: TextStyle(
                             fontSize: 13.0,
                             color: AppColors.black,
@@ -137,7 +138,7 @@ class SearchDoctorBox extends StatelessWidget {
                           ),
                         ),
                         TextSpan(
-                          text: '- Hospital St, Colombo 00100, Sri Lanka',
+                          text: ' - ' + locationAddress,
                           style: TextStyle(
                             fontSize: 13.0,
                             color: AppColors.black,
@@ -153,7 +154,8 @@ class SearchDoctorBox extends StatelessWidget {
           ),
 
           /// show/hide available dates
-            ExpandDates(FreeSlots,doctorFullName,id,consultationFee),
+          ExpandDates(FreeSlots, doctorTitle, doctorFullName, id,
+              consultationFee, locationName, locationAddress),
         ],
       ),
     );

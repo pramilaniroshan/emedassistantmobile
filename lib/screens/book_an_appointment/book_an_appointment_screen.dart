@@ -78,7 +78,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
           queryParameters: {
             "DoctorName": nameController.text,
             "LocationAddress": locationController.text,
-            "Date": date,
+            //"Date": date,
           }).then((res) {
         EasyLoading.dismiss();
         var rdata = res.data['Data']['Data'];
@@ -481,9 +481,12 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                         (index) => SearchDoctorBox(
                             doctorlist[index]["IanaTimeZoneId"],
                             doctorlist[index]["Id"],
+                            doctorlist[index]["DoctorTitle"],
                             doctorlist[index]["DoctorFullName"],
                             doctorlist[index]["FreeSlots"],
-                            doctorlist[index]["ConsultationFee"])))
+                            doctorlist[index]["ConsultationFee"],
+                            doctorlist[index]["Location"]['LocationName'],
+                            doctorlist[index]["Location"]['LocationAddress'])))
           ],
         ),
       ),

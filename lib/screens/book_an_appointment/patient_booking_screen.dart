@@ -14,13 +14,26 @@ import 'package:emedassistantmobile/config/app_images.dart';
 import '../../config/constants.dart';
 
 class PatientBookingScreen extends StatefulWidget {
+  final String? dayText;
+  final String? dateText;
   final String? timeSlotText;
   final String id;
   final int? consultationFee;
+  final String? title;
   final String? doctorFullName;
+  final String? locationName;
+  final String? locationAddress;
 
   const PatientBookingScreen(
-      this.timeSlotText, this.consultationFee, this.doctorFullName, this.id,
+      this.dayText,
+      this.dateText,
+      this.timeSlotText,
+      this.consultationFee,
+      this.title,
+      this.doctorFullName,
+      this.id,
+      this.locationName,
+      this.locationAddress,
       {Key? key})
       : super(key: key);
 
@@ -167,7 +180,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              widget.doctorFullName ?? '',
+                              widget.title! + ' ' + widget.doctorFullName!,
                               style: TextStyle(
                                 fontSize: 24.0,
                                 fontWeight: FontWeight.bold,
@@ -220,8 +233,8 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                               RichText(
                                 text: TextSpan(
                                   children: [
-                                    TextSpan(
-                                      text: 'Tuesday, ',
+                                    const TextSpan(
+                                      text: '',
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -229,7 +242,9 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: '12 Apr ',
+                                      text: widget.dayText! +
+                                          ' ' +
+                                          widget.dateText!,
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -237,7 +252,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: widget.timeSlotText,
+                                      text: ' ' + widget.timeSlotText!,
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -282,7 +297,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                                 text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: '\$ ',
+                                      text: '\රු ',
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -298,7 +313,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: 'total cost ',
+                                      text: '',
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -332,10 +347,10 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               RichText(
-                                text: const TextSpan(
+                                text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: 'Colombo Center ',
+                                      text: widget.locationName! + ' ',
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -343,8 +358,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text:
-                                          '- Hospital St, Colombo 00100, Sri Lanka',
+                                      text: '- ' + widget.locationAddress!,
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         color: AppColors.black,
@@ -413,7 +427,9 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CustomButton(
-                          onTap: () {},
+                          onTap: () {
+                            Get.back();
+                          },
                           btnColor: AppColors.white,
                           fontColor: AppColors.black,
                           btnText: 'Cancel',
