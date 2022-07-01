@@ -1,6 +1,8 @@
+import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:emedassistantmobile/widgets/custom_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,22 +46,13 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
         "Time": widget.timeSlotText,
         "PatientNotes": descController.text,
       }).then((res) {
-        print(res.data);
         setState(() {});
-        print(res.data);
+        EasyLoading.showSuccess('Done');
+        Get.to(const MyAppointmentsScreen());
       });
     } on DioError catch (e) {
-      // The request was made and the
-      // server responded with a status code
-      // that falls out of the range of 2xx and is also not 304.
       print(e.response!.data);
-      // if (e.response != null) {
-      //  // print(e);
-      // } else {
-      //   // Something happened in setting up or sending the request that triggered an Error
-      //   //print(e);
-      //   //print(e);
-      // }
+      EasyLoading.showError(e.response!.data);
     }
   }
 
@@ -601,7 +594,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: const [
             Text(
-              'Mr. Abcdjajd',
+              'Name',
               style: TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w500,

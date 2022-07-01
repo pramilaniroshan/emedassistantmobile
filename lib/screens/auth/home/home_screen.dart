@@ -108,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> loginResend() async {
     try {
-      print(Constants().getBaseUrl());
       var dio = Dio();
       await dio
           .post(Constants().getBaseUrl() + '/Authentication/Login-init', data: {
@@ -136,41 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
   }
-
-  // int otp() {
-  //   var dio = Dio();
-  //   dio.post('https://localhost:5001/api/v1/Authentication/Login', data: {
-  //     "UserName": emailController.text,
-  //     "Otp": codeController.text,
-  //     "DeviceId": "210"
-  //   }).then((res) async {
-  //     if (res.statusCode == 200) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(
-  //           content: Text('Done Logged In'),
-  //           backgroundColor: Colors.green,
-  //         ),
-  //       );
-  //       final body = res.data["Data"];
-  //       //print(body["AccessToken"]);
-  //       prefs = await SharedPreferences.getInstance();
-  //       prefs.setString('token', body["AccessToken"]);
-  //       prefs.setString('refresh_token', "yes");
-  //       prefs.setBool('login', true);
-  //       Get.to(const MyAppointmentsScreen());
-  //       //print(res.data);
-  //     } else if (res.statusCode == 400) {
-  //       print('error');
-  //     }
-  //     print(res.data);
-  //     return res.statusCode;
-  //   }).onError((error, stackTrace) {
-  //     print(stackTrace);
-  //     return null;
-  //   });
-  //   return 0;
-  //   //print(response);
-  // }
 
   void otp() async {
     var dio = Dio();
@@ -498,24 +462,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const Text(
                       'Join now as',
-                      style: TextStyle(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.black,
-                      ),
-                    ),
-                    const SizedBox(width: 8.0),
-                    CustomButton(
-                      onTap: () {},
-                      btnText: 'Doctor',
-                      width: 80.0,
-                      btnColor: AppColors.white,
-                      fontColor: AppColors.secondary,
-                      borderColor: AppColors.secondary,
-                    ),
-                    const SizedBox(width: 8.0),
-                    const Text(
-                      'or',
                       style: TextStyle(
                         fontSize: 15.0,
                         fontWeight: FontWeight.w500,
