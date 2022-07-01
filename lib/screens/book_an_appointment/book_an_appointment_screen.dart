@@ -2,12 +2,14 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
 import 'package:emedassistantmobile/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
@@ -36,10 +38,22 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
 
   String? selectedValue;
   List<String> items = [
-    '15 minutes',
-    '1 hour',
-    '4 hours',
-    '24 hours',
+    'Allergists/Immunologists',
+    'Anesthesiologists',
+    'Cardiologists',
+    'Colon and Rectal Surgeons',
+    'Critical Care Medicine Spec.',
+    'Dermatologists',
+    'Endocrinologists',
+    'Preventive Medicine Spec.',
+    'Psychiatrists',
+    'Pulmonologists',
+    'Radiologists',
+    'Rhenumatologists',
+    'Medicine Spec.',
+    'Sports Medicine Spec.',
+    'General Surgeons',
+    'Urologists',
   ];
 
   final Set<Marker> _markers = {};
@@ -51,8 +65,8 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
   }
 
   void searchDoctor() async {
+    EasyLoading.show(status: 'loading...');
     doctorlist.clear();
-    print('Search Doctor');
     prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token") ?? '';
     print(token);
@@ -61,7 +75,12 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
       dio.options.headers["authorization"] = "Bearer " + token;
       await dio.get(
           Constants().getBaseUrl() + '/Patient/SearchDoctorAvailability',
-          queryParameters: {"DoctorName": nameController.text}).then((res) {
+          queryParameters: {
+            "DoctorName": nameController.text,
+            "LocationAddress": locationController.text,
+            "Date": date,
+          }).then((res) {
+        EasyLoading.dismiss();
         var rdata = res.data['Data']['Data'];
         for (var i in rdata) {
           doctorlist.add(i);
@@ -70,18 +89,17 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
         print(res.data);
       });
     } on DioError catch (e) {
-      // The request was made and the
-      // server responded with a status code
-      // that falls out of the range of 2xx and is also not 304.
+      EasyLoading.dismiss();
       print(e.response!.statusCode);
-      // if (e.response != null) {
-      //  // print(e);
-      // } else {
-      //   // Something happened in setting up or sending the request that triggered an Error
-      //   //print(e);
-      //   //print(e);
-      // }
     }
+  }
+
+  void clearForm() {
+    setState(() {
+      date = DateTime.now();
+      nameController.clear();
+      locationController.clear();
+    });
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -109,6 +127,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
       setState(() {
         date = picked ?? date;
       });
+      print(date);
     }
 
     double height = MediaQuery.of(context).size.height;
@@ -388,22 +407,38 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
 
                   /// Search Button
                   const SizedBox(height: 32.0),
-                  Center(
-                    child: CustomButton(
-                      onTap: () {
-                        searchDoctor();
-                        /*Get.dialog(
+                  ListTile(
+                    title: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: CustomButton(
+                            onTap: () {
+                              searchDoctor();
+                              /*Get.dialog(
                           const ScheduleSlotDialog(),
                         );*/
-                        // Get.dialog(
-                        //   const DoctorAvailabilityDialog(),
-                        // );
-                      },
-                      btnText: 'Search',
-                      width: 90.0,
-                      height: 36.0,
+                              // Get.dialog(
+                              //   const DoctorAvailabilityDialog(),
+                              // );
+                            },
+                            btnText: 'Search',
+                            width: 90.0,
+                            height: 36.0,
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        Expanded(
+                          child: CustomButton(
+                              btnText: 'Clear',
+                              btnColor: AppColors.lightBackground,
+                              fontColor: AppColors.lightBlack,
+                              width: 90.0,
+                              height: 36.0,
+                              onTap: (() => {clearForm()})),
+                        ),
+                      ],
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -420,19 +455,26 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),
-                  // child: GoogleMap(
-                  //   onMapCreated: _onMapCreated,
-                  //   markers: _markers,
-                  //   initialCameraPosition: const CameraPosition(
-                  //     target: LatLng(30.587968, 60.814708),
-                  //     //zoom: 5,
-                  //   ),
-                  // ),
+                  child: kIsWeb
+                      ? Text('Map plugin')
+                      : GoogleMap(
+                          onMapCreated: _onMapCreated,
+                          //markers: _markers,
+                          initialCameraPosition: const CameraPosition(
+                            target: LatLng(30.587968, 60.814708),
+                            //zoom: 5,
+                          ),
+                        ),
                 ),
               ),
             ),
             doctorlist.isEmpty
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: Text(
+                    'No any Data to display...',
+                    style: TextStyle(
+                        color: AppColors.redColor, fontWeight: FontWeight.bold),
+                  ))
                 : Column(
                     children: List.generate(
                         doctorlist.length,
@@ -442,20 +484,6 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                             doctorlist[index]["DoctorFullName"],
                             doctorlist[index]["FreeSlots"],
                             doctorlist[index]["ConsultationFee"])))
-
-            /// List of search items
-            //getDoctorList(doctorlist),
-            // ListView.builder(
-            //     padding: const EdgeInsets.all(8),
-            //     itemCount: doctorlist.length,
-            //     itemBuilder: (BuildContext context, int index) {
-            //       return Container(
-            //         height: 50,
-            //         color: Colors.amber,
-            //         child: Center(child: Text('Entry ${[index]}')),
-            //       );
-            //     }),
-            ///const SizedBox(height: 40.0),
           ],
         ),
       ),
@@ -621,7 +649,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: const [
             Text(
-              'Mr. Abcdjajd',
+              'Name',
               style: TextStyle(
                 fontSize: 16.0,
                 fontWeight: FontWeight.w500,
