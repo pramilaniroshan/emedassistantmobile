@@ -1,4 +1,3 @@
-
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +12,8 @@ class CustomButton extends StatelessWidget {
   final Color? borderColor;
   final VoidCallback? onTap;
 
-  const CustomButton({Key? key,
+  const CustomButton({
+    Key? key,
     this.width,
     this.height = 40.0,
     this.radius = 6.0,
@@ -37,7 +37,8 @@ class CustomButton extends StatelessWidget {
         ),
       ),
       onPressed: onTap,
-      child: Text(btnText!,
+      child: Text(
+        btnText!,
         style: TextStyle(
           fontSize: fontSize,
           fontWeight: FontWeight.w600,
