@@ -10,7 +10,7 @@ class ExpandDates extends StatefulWidget {
   final List freeSlots;
   final String doctorTitle;
   final String doctorFullName;
-  final int consultationFee;
+  final double consultationFee;
   final String locationName;
   final String locationAddress;
 

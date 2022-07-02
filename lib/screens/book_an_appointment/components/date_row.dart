@@ -9,7 +9,7 @@ class DateRow extends StatelessWidget {
   final String? dateText;
   final String? timeSlotText;
   final String id;
-  final int? consultationFee;
+  final double? consultationFee;
   final String? title;
   final String? doctorFullName;
   final String locationName;

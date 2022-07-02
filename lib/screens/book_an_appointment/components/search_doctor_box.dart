@@ -19,7 +19,7 @@ class SearchDoctorBox extends StatelessWidget {
   // final int lastAppointmentNumber;
   // final String avgTimeForPatient;
   // final String endTime;
-  final int consultationFee;
+  final double consultationFee;
   // final bool isActive;
   //final Array delays;
   final List FreeSlots;
