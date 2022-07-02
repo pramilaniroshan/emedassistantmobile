@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:form_validator/form_validator.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:emedassistantmobile/widgets/custom_button.dart';
@@ -36,22 +37,23 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   String? title;
   List<String> items = ['Mr', 'Mrs', 'Ms', 'Miss'];
 
-  String? cCode;
+  String? cCode = '+94';
   List<String> cCodes = ['+94', '+91'];
 
   FToast? fToast;
   late SharedPreferences prefs;
+  final _formKey = GlobalKey<FormState>();
 
   void patientRegister(double width) async {
     EasyLoading.show(status: 'loading...');
     try {
       var dio = Dio();
       await dio.post(Constants().getBaseUrl() + '/Registration/Patient', data: {
-        "Title": "Mr",
+        "Title": title,
         "FirstName": nameController.text,
         "LastName": lastNameController.text,
         "Email": emailController.text,
-        "PhoneNumber": "+94" + mobileNumberController.text,
+        "PhoneNumber": cCode! + mobileNumberController.text,
         "RegisterType": 0,
         "CountryCode": 210,
         "Address": addressController.text
@@ -342,343 +344,363 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(8.0),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Title',
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      color: AppColors.lightBlack,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Container(
-                    height: 40.0,
-                    width: 110.0,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColors.lightBackground,
-                        width: 2.0,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Title',
+                      style: TextStyle(
+                        fontSize: 15.0,
+                        color: AppColors.lightBlack,
+                        fontWeight: FontWeight.w500,
                       ),
-                      borderRadius: BorderRadius.circular(5.0),
                     ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton2(
-                        value: title,
-                        style: const TextStyle(color: Colors.black),
-                        icon: const Icon(Icons.keyboard_arrow_down),
-                        hint: const Text(
-                          'Mr',
+                    const SizedBox(height: 8.0),
+                    Container(
+                      height: 40.0,
+                      width: 110.0,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColors.lightBackground,
+                          width: 2.0,
+                        ),
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton2(
+                          value: title,
+                          style: const TextStyle(color: Colors.black),
+                          icon: const Icon(Icons.keyboard_arrow_down),
+                          hint: const Text(
+                            'Mr',
+                            style: TextStyle(
+                              fontSize: 13.0,
+                              color: AppColors.lightBlack,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          items: items
+                              .map(
+                                (item) => DropdownMenuItem<String>(
+                                  value: item,
+                                  child: Text(
+                                    item,
+                                    style: const TextStyle(
+                                      fontSize: 15.0,
+                                      color: AppColors.lightBlack,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              title = newValue;
+                            });
+                          },
+                          buttonHeight: 40,
+                          buttonWidth: 140,
+                          itemHeight: 36.0,
+                          dropdownWidth: 150,
+                          buttonPadding:
+                              const EdgeInsets.symmetric(horizontal: 8.0),
+                          dropdownDecoration: const BoxDecoration(
+                            color: AppColors.lightBackground,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: const [
+                        Text(
+                          '* ',
                           style: TextStyle(
-                            fontSize: 13.0,
+                            fontSize: 18.0,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          'Name',
+                          style: TextStyle(
+                            fontSize: 15.0,
                             color: AppColors.lightBlack,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        items: items
-                            .map(
-                              (item) => DropdownMenuItem<String>(
-                                value: item,
-                                child: Text(
-                                  item,
-                                  style: const TextStyle(
-                                    fontSize: 15.0,
-                                    color: AppColors.lightBlack,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            title = newValue;
-                          });
-                        },
-                        buttonHeight: 40,
-                        buttonWidth: 140,
-                        itemHeight: 36.0,
-                        dropdownWidth: 150,
-                        buttonPadding:
-                            const EdgeInsets.symmetric(horizontal: 8.0),
-                        dropdownDecoration: const BoxDecoration(
-                          color: AppColors.lightBackground,
-                        ),
-                      ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Text(
-                        '* ',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        'Name',
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: AppColors.lightBlack,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  CustomField(
-                    controller: nameController,
-                    height: 40.0,
-                    keyboardType: TextInputType.name,
-                    width: width,
-                  ),
-                  const SizedBox(height: 24.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Text(
-                        '* ',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        'Last Name',
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: AppColors.lightBlack,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  CustomField(
-                    controller: lastNameController,
-                    height: 40.0,
-                    keyboardType: TextInputType.name,
-                    width: width,
-                  ),
-                  const SizedBox(height: 24.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Text(
-                        '* ',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        'Email',
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: AppColors.lightBlack,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  CustomField(
-                    controller: emailController,
-                    height: 40.0,
-                    keyboardType: TextInputType.emailAddress,
-                    width: width,
-                    isPrefixIcon: true,
-                    prefixIcon: const Icon(
-                      Icons.email_outlined,
-                      size: 24.0,
-                      color: AppColors.lightBlack,
+                    CustomField(
+                      controller: nameController,
+                      validator: ValidationBuilder()
+                          .minLength(3, 'Min lenght is 3')
+                          .maxLength(50, 'Max Lenght is 500')
+                          .build(),
+                      height: 40.0,
+                      keyboardType: TextInputType.name,
+                      width: width,
                     ),
-                    padding: const EdgeInsets.only(top: 4.0),
-                  ),
-                  const SizedBox(height: 24.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  '* ',
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  'Country Code',
-                                  style: TextStyle(
-                                    fontSize: 15.0,
-                                    color: AppColors.lightBlack,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              height: 40.0,
-                              margin: const EdgeInsets.only(top: 8.0),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: AppColors.lightBackground,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(5.0),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton2(
-                                  icon: const Icon(Icons.keyboard_arrow_down),
-                                  hint: const Text(
-                                    '+94',
-                                    style: TextStyle(
-                                      fontSize: 13.0,
-                                      color: AppColors.redColor,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  items: cCodes
-                                      .map(
-                                        (item) => DropdownMenuItem<String>(
-                                          value: item,
-                                          child: Text(
-                                            item,
-                                            style: const TextStyle(
-                                              fontSize: 15.0,
-                                              backgroundColor: Colors.red,
-                                              color: Colors.black45,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                                  value: cCode,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      cCode = value as String;
-                                    });
-                                  },
-                                  buttonHeight: 40,
-                                  buttonWidth: 140,
-                                  itemHeight: 36.0,
-                                  dropdownWidth: 150,
-                                  dropdownDecoration: const BoxDecoration(
-                                    color: AppColors.lightBlack,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                    const SizedBox(height: 24.0),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: const [
+                        Text(
+                          '* ',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8.0),
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: const [
-                                Text(
-                                  '* ',
-                                  style: TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  'Mobile Number',
-                                  style: TextStyle(
-                                    fontSize: 15.0,
-                                    color: AppColors.lightBlack,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            CustomField(
-                              controller: mobileNumberController,
-                              height: 40.0,
-                              keyboardType: TextInputType.number,
-                              width: width,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24.0),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: const [
-                      Text(
-                        '* ',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        'Your home location: City, Street name...',
-                        style: TextStyle(
-                          fontSize: 15.0,
-                          color: AppColors.lightBlack,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                  CustomField(
-                    controller: addressController,
-                    height: 40.0,
-                    keyboardType: TextInputType.streetAddress,
-                    width: width,
-                  ),
-                  const SizedBox(height: 12.0),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CustomButton(
-                          onTap: () {
-                            patientRegister(width);
-                          },
-                          btnText: 'Submit',
-                          width: 80.0,
+                        Text(
+                          'Last Name',
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            color: AppColors.lightBlack,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    CustomField(
+                      controller: lastNameController,
+                      validator: ValidationBuilder()
+                          .minLength(3, 'Min lenght is 3')
+                          .maxLength(50, 'Max Lenght is 500')
+                          .build(),
+                      height: 40.0,
+                      keyboardType: TextInputType.name,
+                      width: width,
+                    ),
+                    const SizedBox(height: 24.0),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: const [
+                        Text(
+                          '* ',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          'Email',
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            color: AppColors.lightBlack,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    CustomField(
+                      controller: emailController,
+                      validator:
+                          ValidationBuilder().email().maxLength(50).build(),
+                      height: 40.0,
+                      keyboardType: TextInputType.emailAddress,
+                      width: width,
+                      isPrefixIcon: true,
+                      prefixIcon: const Icon(
+                        Icons.email_outlined,
+                        size: 24.0,
+                        color: AppColors.lightBlack,
+                      ),
+                      padding: const EdgeInsets.only(top: 4.0),
+                    ),
+                    const SizedBox(height: 24.0),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    '* ',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Country Code',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: AppColors.lightBlack,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                height: 40.0,
+                                margin: const EdgeInsets.only(top: 8.0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: AppColors.lightBackground,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton2(
+                                    icon: const Icon(Icons.keyboard_arrow_down),
+                                    hint: const Text(
+                                      ' +94',
+                                      style: TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    items: cCodes
+                                        .map(
+                                          (item) => DropdownMenuItem<String>(
+                                            value: item,
+                                            child: Text(
+                                              item,
+                                              style: const TextStyle(
+                                                fontSize: 15.0,
+                                                color: AppColors.lightBlack,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                        .toList(),
+                                    value: cCode,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        cCode = value as String;
+                                      });
+                                    },
+                                    buttonHeight: 40,
+                                    buttonWidth: 140,
+                                    itemHeight: 36.0,
+                                    dropdownWidth: 150,
+                                    dropdownDecoration: const BoxDecoration(
+                                      color: AppColors.lightBackground,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8.0),
+                        Expanded(
+                          flex: 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    '* ',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Mobile Number',
+                                    style: TextStyle(
+                                      fontSize: 15.0,
+                                      color: AppColors.lightBlack,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              CustomField(
+                                controller: mobileNumberController,
+                                validator: ValidationBuilder().phone().build(),
+                                hintText: '710000000',
+                                height: 40.0,
+                                keyboardType: TextInputType.number,
+                                width: width,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24.0),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: const [
+                        Text(
+                          '* ',
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          'Your home location: City, Street name...',
+                          style: TextStyle(
+                            fontSize: 15.0,
+                            color: AppColors.lightBlack,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                    CustomField(
+                      controller: addressController,
+                      validator: ValidationBuilder()
+                          .minLength(3, 'Min lenght is 10')
+                          .maxLength(50, 'Max Lenght is 500')
+                          .build(),
+                      height: 40.0,
+                      keyboardType: TextInputType.streetAddress,
+                      width: width,
+                    ),
+                    const SizedBox(height: 12.0),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          CustomButton(
+                            onTap: () {
+                              if (_formKey.currentState!.validate()) {
+                                patientRegister(width);
+                              }
+                            },
+                            btnText: 'Submit',
+                            width: 80.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
