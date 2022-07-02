@@ -137,7 +137,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void otp() async {
-    var dio = Dio();
     try {
       var dio = Dio();
       await dio.post(Constants().getBaseUrl() + '/Authentication/Login', data: {
