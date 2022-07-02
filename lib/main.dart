@@ -1,6 +1,5 @@
 import 'package:emedassistantmobile/config/app_images.dart';
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
-import 'package:emedassistantmobile/screens/calendar/calendar_screen.dart';
 import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -21,21 +20,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-//  bool checkLogin()  {
-
-//   // Future<SharedPreferences> prefs =  SharedPreferences.getInstance();
-
-//   // prefs.then((value) {
-//   //     print(value.containsKey('counter'));
-//   //     return true;
-//   // });
-//   // if(prefs.containsKey('Jwt_token')){
-//   //   return true;
-//   // }
-//   // return false;
-//   return false;
-// //   }
-// checkLogin();
     Future<SharedPreferences> prefs = SharedPreferences.getInstance();
     var isLoggedUser = prefs.then((value) {
       value.setString('counter', "yes");
