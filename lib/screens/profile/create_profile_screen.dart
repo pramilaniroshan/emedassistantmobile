@@ -99,7 +99,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         prefs.setString('token', body["AccessToken"]);
         prefs.setString('refresh_token', "yes");
         prefs.setBool('login', true);
-        Get.to(const MyAppointmentsScreen());
+        Get.offAll(const MyAppointmentsScreen());
       });
     } on DioError catch (e) {
       String error = e.response!.data['Error'] +
@@ -375,7 +375,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           style: const TextStyle(color: Colors.black),
                           icon: const Icon(Icons.keyboard_arrow_down),
                           hint: const Text(
-                            'Mr',
+                            '',
                             style: TextStyle(
                               fontSize: 13.0,
                               color: AppColors.lightBlack,
