@@ -5,11 +5,16 @@ import 'package:emedassistantmobile/screens/doctor_appointment/doctor_appointmen
 import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:emedassistantmobile/widgets/custom_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'package:emedassistantmobile/widgets/custom_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../config/constants.dart';
+import '../../widgets/toast.dart';
 
 class CreateProfileScreen extends StatefulWidget {
   const CreateProfileScreen({Key? key}) : super(key: key);
@@ -19,8 +24,6 @@ class CreateProfileScreen extends StatefulWidget {
 }
 
 class _CreateProfileScreenState extends State<CreateProfileScreen> {
-
-
   TextEditingController nameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -28,84 +31,118 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   TextEditingController addressController = TextEditingController();
   TextEditingController codeController = TextEditingController();
 
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String? title;
-  List<String> items = [
-    'Mr',
-    'Mrs'
-  ];
+  List<String> items = ['Mr', 'Mrs', 'Ms', 'Miss'];
 
-String? cCode;
-  List<String> cCodes = [
-    '+94',
-    '+91'
-  ];
+  String? cCode;
+  List<String> cCodes = ['+94', '+91'];
 
-  Future <void> sh() async{
-SharedPreferences prefs = await SharedPreferences.getInstance();
-prefs.setString('counter', "yes");
-print(prefs.getString('counter'));
+  FToast? fToast;
+  late SharedPreferences prefs;
+
+  void patientRegister(double width) async {
+    EasyLoading.show(status: 'loading...');
+    try {
+      var dio = Dio();
+      await dio.post(Constants().getBaseUrl() + '/Registration/Patient', data: {
+        "Title": "Mr",
+        "FirstName": nameController.text,
+        "LastName": lastNameController.text,
+        "Email": emailController.text,
+        "PhoneNumber": "+94" + mobileNumberController.text,
+        "RegisterType": 0,
+        "CountryCode": 210,
+        "Address": addressController.text
+      }).then((res) {
+        if (res.statusCode == 200) {
+          EasyLoading.dismiss();
+          //showErrorToast(fToast: fToast, isError: false, msg: 'Code sent');
+          Get.defaultDialog(
+            backgroundColor: AppColors.lightBackground,
+            radius: 2.0,
+            title: '',
+            content: bottomSheetColumn(width),
+          );
+        }
+      });
+    } on DioError catch (e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      if (e.response != null) {
+        EasyLoading.dismiss();
+        var t = e.response!.data["Error"];
+        showErrorToast(
+            fToast: fToast, isError: true, msg: e.response!.data["Error"]);
+        setState(() {});
+      } else {
+        EasyLoading.dismiss();
+        showErrorToast(fToast: fToast, isError: true, msg: e.message);
+      }
+    }
   }
 
-    int user_reg(double width) {
-   var dio = Dio();
-   dio.post('https://localhost:5001/api/v1/Registration/Patient',data: {
-  "Title": "Mr",
-  "FirstName": nameController.text,
-  "LastName": lastNameController.text,
-  "Email": emailController.text,
-  "PhoneNumber": "+94" + mobileNumberController.text,
-  "RegisterType": 0,
-  "CountryCode": 210,
-  "Address": addressController.text
-}).then((res) {
-  if (res.statusCode == 200) {
-   Get.defaultDialog(
-                        backgroundColor: AppColors.lightBackground,
-                        radius: 2.0,
-                        title: '',
-                        content: bottomSheetColumn(width),
-                        
-                      );
+  void otp() async {
+    try {
+      var dio = Dio();
+      await dio.post(Constants().getBaseUrl() + '/Authentication/Login', data: {
+        "UserName": emailController.text,
+        "Otp": codeController.text,
+        "DeviceId": "210"
+      }).then((res) async {
+        showErrorToast(fToast: fToast, isError: false, msg: 'Done');
+        final body = res.data["Data"];
+        prefs = await SharedPreferences.getInstance();
+        prefs.setString('token', body["AccessToken"]);
+        prefs.setString('refresh_token', "yes");
+        prefs.setBool('login', true);
+        Get.to(const MyAppointmentsScreen());
+      });
+    } on DioError catch (e) {
+      String error = e.response!.data['Error'] +
+          'Remaining' +
+          '${e.response!.data['Data']}' +
+          'Attempts';
+      showErrorToast(
+          fToast: fToast, isError: true, msg: e.response!.data['Error']);
+    }
   }
-     print(res.statusCode);
-     return res.statusCode;
-   }).onError((error, stackTrace) {
 
-print(error);
-return null;
-
-   });
-   return 0;
-   //print(response);
- }
-
-  int otp() {
-   var dio = Dio();
-   dio.post('https://localhost:5001/api/v1/Authentication/Login',data: {
-  "UserName": emailController.text,
-  "Otp": codeController.text,
-  "DeviceId": "210"
-}).then((res) {
-  if (res.statusCode == 200) {
-   Get.to(const MyAppointmentsScreen());
+  Future<void> loginResend() async {
+    try {
+      var dio = Dio();
+      await dio
+          .post(Constants().getBaseUrl() + '/Authentication/Login-init', data: {
+        "Username": emailController.text,
+        "UserLoginType": 1,
+        "CountryCode": 210,
+        "Application": 0
+      }).then((res) {
+        if (res.statusCode == 200) {
+          showErrorToast(fToast: fToast, isError: false, msg: 'Code sent');
+        }
+      });
+    } on DioError catch (e) {
+      if (e.response != null) {
+        var t = e.response!.data["Error"];
+        showErrorToast(
+            fToast: fToast, isError: true, msg: e.response!.data["Error"]);
+        setState(() {});
+      } else {
+        showErrorToast(fToast: fToast, isError: true, msg: e.message);
+      }
+    }
   }
-     print(res.data);
-     return res.statusCode;
-   }).onError((error, stackTrace) => null);
-   return 0;
-   //print(response);
- }
 
   @override
   void initState() {
     // TODO: implement initState
-    print(title);
-    sh();
+    fToast = FToast();
+    fToast!.init(context);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -126,7 +163,6 @@ return null;
           menuButton(),
         ],
       ),
-
       endDrawer: Drawer(
         backgroundColor: AppColors.white,
         elevation: 0.0,
@@ -138,7 +174,7 @@ return null;
             Align(
               alignment: Alignment.bottomRight,
               child: IconButton(
-                onPressed: (){
+                onPressed: () {
                   Get.back();
                 },
                 icon: SvgPicture.asset(
@@ -148,7 +184,7 @@ return null;
             ),
             const SizedBox(height: 20.0),
             ListTile(
-              onTap: (){},
+              onTap: () {},
               leading: Padding(
                 padding: const EdgeInsets.only(top: 6.0, left: 12.0),
                 child: SvgPicture.asset(
@@ -161,7 +197,8 @@ return null;
               ),
               title: const Align(
                 alignment: Alignment(-1.3, 0),
-                child: Text('Support',
+                child: Text(
+                  'Support',
                   style: TextStyle(
                     fontSize: 21.0,
                     color: AppColors.black,
@@ -171,7 +208,7 @@ return null;
               ),
             ),
             ListTile(
-              onTap: (){},
+              onTap: () {},
               leading: Padding(
                 padding: const EdgeInsets.only(top: 6.0, left: 12.0),
                 child: SvgPicture.asset(
@@ -184,7 +221,8 @@ return null;
               ),
               title: const Align(
                 alignment: Alignment(-1.3, 0),
-                child: Text('Contact',
+                child: Text(
+                  'Contact',
                   style: TextStyle(
                     fontSize: 21.0,
                     color: AppColors.black,
@@ -194,7 +232,7 @@ return null;
               ),
             ),
             ListTile(
-              onTap: (){},
+              onTap: () {},
               leading: Padding(
                 padding: const EdgeInsets.only(top: 6.0, left: 12.0),
                 child: SvgPicture.asset(
@@ -207,7 +245,8 @@ return null;
               ),
               title: const Align(
                 alignment: Alignment(-1.3, 0),
-                child: Text('Terms',
+                child: Text(
+                  'Terms',
                   style: TextStyle(
                     fontSize: 21.0,
                     color: AppColors.black,
@@ -217,7 +256,7 @@ return null;
               ),
             ),
             ListTile(
-              onTap: (){},
+              onTap: () {},
               leading: Padding(
                 padding: const EdgeInsets.only(top: 6.0, left: 12.0),
                 child: SvgPicture.asset(
@@ -230,7 +269,8 @@ return null;
               ),
               title: const Align(
                 alignment: Alignment(-1.3, 0),
-                child: Text('eMed.com',
+                child: Text(
+                  'eMed.com',
                   style: TextStyle(
                     fontSize: 21.0,
                     color: AppColors.black,
@@ -241,7 +281,7 @@ return null;
             ),
             SizedBox(height: height * 0.06),
             ListTile(
-              onTap: (){},
+              onTap: () {},
               leading: Padding(
                 padding: const EdgeInsets.only(top: 6.0, left: 12.0),
                 child: SvgPicture.asset(
@@ -254,7 +294,8 @@ return null;
               ),
               title: const Align(
                 alignment: Alignment(-1.1, 0),
-                child: Text('English',
+                child: Text(
+                  'English',
                   style: TextStyle(
                     fontSize: 16.0,
                     color: AppColors.black,
@@ -262,12 +303,12 @@ return null;
                   ),
                 ),
               ),
-              trailing: const Icon(Icons.keyboard_arrow_down_outlined, color: AppColors.black),
+              trailing: const Icon(Icons.keyboard_arrow_down_outlined,
+                  color: AppColors.black),
             ),
           ],
         ),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 40.0),
         child: Column(
@@ -278,15 +319,16 @@ return null;
             Padding(
               padding: const EdgeInsets.only(left: 16.0),
               child: GestureDetector(
-                onTap: (){
+                onTap: () {
                   Get.to(const DoctorAppointmentScreen());
                 },
-                child: const Text('Create your profile',
-                style: TextStyle(
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.black,
-                ),
+                child: const Text(
+                  'Create your profile',
+                  style: TextStyle(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.black,
+                  ),
                 ),
               ),
             ),
@@ -294,7 +336,8 @@ return null;
             Container(
               width: width,
               margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 16.0),
               decoration: BoxDecoration(
                 color: AppColors.white,
                 borderRadius: BorderRadius.circular(8.0),
@@ -303,12 +346,13 @@ return null;
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  const Text('Title',
-                  style: TextStyle(
-                    fontSize: 15.0,
-                    color: AppColors.lightBlack,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  const Text(
+                    'Title',
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      color: AppColors.lightBlack,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   const SizedBox(height: 8.0),
                   Container(
@@ -323,29 +367,33 @@ return null;
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton2(
+                        value: title,
+                        style: const TextStyle(color: Colors.black),
                         icon: const Icon(Icons.keyboard_arrow_down),
                         hint: const Text(
-                          'Mr', style: TextStyle(
-                          fontSize: 13.0,
-                          color: AppColors.lightBlack,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        ),
-                        items: items.map((item) => DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: const TextStyle(
-                              fontSize: 15.0,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          'Mr',
+                          style: TextStyle(
+                            fontSize: 13.0,
+                            color: AppColors.lightBlack,
+                            fontWeight: FontWeight.w500,
                           ),
-                        ),)
+                        ),
+                        items: items
+                            .map(
+                              (item) => DropdownMenuItem<String>(
+                                value: item,
+                                child: Text(
+                                  item,
+                                  style: const TextStyle(
+                                    fontSize: 15.0,
+                                    color: AppColors.lightBlack,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            )
                             .toList(),
-                        
                         onChanged: (String? newValue) {
-                          print(title);
                           setState(() {
                             title = newValue;
                           });
@@ -354,9 +402,10 @@ return null;
                         buttonWidth: 140,
                         itemHeight: 36.0,
                         dropdownWidth: 150,
-                        buttonPadding: const EdgeInsets.symmetric(horizontal: 8.0) ,
+                        buttonPadding:
+                            const EdgeInsets.symmetric(horizontal: 8.0),
                         dropdownDecoration: const BoxDecoration(
-                          color: AppColors.lightBlack,
+                          color: AppColors.lightBackground,
                         ),
                       ),
                     ),
@@ -366,19 +415,21 @@ return null;
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: const [
-                      Text('* ',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        color: Colors.red,
-                        fontWeight: FontWeight.w500,
+                      Text(
+                        '* ',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.red,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      ),
-                      Text('Name',
-                      style: TextStyle(
-                        fontSize: 15.0,
-                        color: AppColors.lightBlack,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      Text(
+                        'Name',
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          color: AppColors.lightBlack,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
@@ -393,14 +444,16 @@ return null;
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: const [
-                      Text('* ',
+                      Text(
+                        '* ',
                         style: TextStyle(
                           fontSize: 18.0,
                           color: Colors.red,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Text('Last Name',
+                      Text(
+                        'Last Name',
                         style: TextStyle(
                           fontSize: 15.0,
                           color: AppColors.lightBlack,
@@ -420,14 +473,16 @@ return null;
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: const [
-                      Text('* ',
+                      Text(
+                        '* ',
                         style: TextStyle(
                           fontSize: 18.0,
                           color: Colors.red,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Text('Email',
+                      Text(
+                        'Email',
                         style: TextStyle(
                           fontSize: 15.0,
                           color: AppColors.lightBlack,
@@ -442,9 +497,10 @@ return null;
                     keyboardType: TextInputType.emailAddress,
                     width: width,
                     isPrefixIcon: true,
-                    prefixIcon: const Icon(Icons.email_outlined,
-                        size: 24.0,
-                        color: AppColors.lightBlack,
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      size: 24.0,
+                      color: AppColors.lightBlack,
                     ),
                     padding: const EdgeInsets.only(top: 4.0),
                   ),
@@ -462,14 +518,16 @@ return null;
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: const [
-                                Text('* ',
+                                Text(
+                                  '* ',
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     color: Colors.red,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                Text('Country Code',
+                                Text(
+                                  'Country Code',
                                   style: TextStyle(
                                     fontSize: 15.0,
                                     color: AppColors.lightBlack,
@@ -492,24 +550,28 @@ return null;
                                 child: DropdownButton2(
                                   icon: const Icon(Icons.keyboard_arrow_down),
                                   hint: const Text(
-                                    '+94', style: TextStyle(
-                                    fontSize: 13.0,
-                                    color: AppColors.redColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  ),
-                                  items: cCodes.map((item) => DropdownMenuItem<String>(
-                                    value: item,
-                                    child: Text(
-                                      item,
-                                      style: const TextStyle(
-                                        fontSize: 15.0,
-                                        backgroundColor: Colors.red,
-                                        color: Colors.black45,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                    '+94',
+                                    style: TextStyle(
+                                      fontSize: 13.0,
+                                      color: AppColors.redColor,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                  ),)
+                                  ),
+                                  items: cCodes
+                                      .map(
+                                        (item) => DropdownMenuItem<String>(
+                                          value: item,
+                                          child: Text(
+                                            item,
+                                            style: const TextStyle(
+                                              fontSize: 15.0,
+                                              backgroundColor: Colors.red,
+                                              color: Colors.black45,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      )
                                       .toList(),
                                   value: cCode,
                                   onChanged: (value) {
@@ -541,14 +603,16 @@ return null;
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: const [
-                                Text('* ',
+                                Text(
+                                  '* ',
                                   style: TextStyle(
                                     fontSize: 18.0,
                                     color: Colors.red,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                Text('Mobile Number',
+                                Text(
+                                  'Mobile Number',
                                   style: TextStyle(
                                     fontSize: 15.0,
                                     color: AppColors.lightBlack,
@@ -573,14 +637,16 @@ return null;
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: const [
-                      Text('* ',
+                      Text(
+                        '* ',
                         style: TextStyle(
                           fontSize: 18.0,
                           color: Colors.red,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      Text('Your home location: City, Street name...',
+                      Text(
+                        'Your home location: City, Street name...',
                         style: TextStyle(
                           fontSize: 15.0,
                           color: AppColors.lightBlack,
@@ -597,29 +663,21 @@ return null;
                   ),
                   const SizedBox(height: 12.0),
                   Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  CustomButton(
-                    onTap: (){
-                      user_reg(width);
-                        //test(width);
-                      //   Get.defaultDialog(
-                      //   backgroundColor: AppColors.lightBackground,
-                      //   radius: 2.0,
-                      //   title: '',
-                      //   content: bottomSheetColumn(width),
-                        
-                      // );
-                    },
-                    btnText: 'Submit',
-                    width: 80.0,
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CustomButton(
+                          onTap: () {
+                            patientRegister(width);
+                          },
+                          btnText: 'Submit',
+                          width: 80.0,
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
                 ],
               ),
             ),
@@ -630,143 +688,150 @@ return null;
   }
 
   Widget menuButton() => TextButton(
-    onPressed: (){
-      _scaffoldKey.currentState!.openEndDrawer();
-    },
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: const [
-        Text('Menu',
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w500,
-            color: AppColors.primary,
-          ),
+        onPressed: () {
+          _scaffoldKey.currentState!.openEndDrawer();
+        },
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: const [
+            Text(
+              'Menu',
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primary,
+              ),
+            ),
+            SizedBox(width: 5.0),
+            Icon(Icons.menu, color: AppColors.black, size: 28.0),
+            SizedBox(width: 12.0),
+          ],
         ),
-        SizedBox(width: 5.0),
-        Icon(Icons.menu, color: AppColors.black, size: 28.0),
-        SizedBox(width: 12.0),
-      ],
-    ),
-  );
+      );
 
   Widget bottomBar(width) => Container(
-    height: 50.0,
-    width: width,
-    color: AppColors.white,
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text('@2022 EMED Limited - Company number 123456789',
-          style: TextStyle(
-            fontSize: 12.0,
-            color: AppColors.black,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(width: 8.0),
-        SvgPicture.asset(AppImages.eMedIcon, height: 20.0, width: 20.0),
-      ],
-    ),
-  );
-
- Widget bottomSheetColumn(width) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: [
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(width: 10.0),
-          //SvgPicture.asset(AppImages.termsIcon, height: 20.0, width: 20.0),
-          //const SizedBox(width: 10.0),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Text('Thanks for your \nregistration.',
-                  style: TextStyle(
-                    fontSize: 30.0,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 14.0),
-                const Text('We have just sent you via email and SMS the temporary code to access.Please check your inbox or mobile phone and sign in.',
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 18.0),
-                const Text('Attention, the code will expire in 5',
-                  style: TextStyle(
-                    fontSize: 13.0,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                Container(
-                  height: 35.0,
-                  width: width,
-                  margin: const EdgeInsets.only(right: 16.0, top: 8.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3.0),
-                    border: Border.all(
-                      color: AppColors.primary,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: TextFormField(
-                    controller: codeController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: 'code',
-                      contentPadding: EdgeInsets.only(left: 16.0, bottom: 16.0),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      CustomButton(
-                        onTap: (){
-                         // Get.to(ProfileSetupOneScreen());
-                         var statuscode = otp();
-                          
-                        },
-                        btnText: 'Submit',
-                        width: 80.0,
-                      ),
-                    ],
-                  ),
-                ),
-                TextButton(
-                  onPressed: (){},
-                  child: const Text('Send me again the verification code',
-                    style: TextStyle(
-                      fontSize: 13.0,
-                      color: AppColors.secondary,
-                      fontWeight: FontWeight.w600,
-                      fontStyle: FontStyle.normal,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ],
+        height: 50.0,
+        width: width,
+        color: AppColors.white,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              '@2022 EMED Limited - Company number 123456789',
+              style: TextStyle(
+                fontSize: 12.0,
+                color: AppColors.black,
+                fontWeight: FontWeight.w500,
+              ),
             ),
+            const SizedBox(width: 8.0),
+            SvgPicture.asset(AppImages.eMedIcon, height: 20.0, width: 20.0),
+          ],
+        ),
+      );
+
+  Widget bottomSheetColumn(width) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(width: 10.0),
+              //SvgPicture.asset(AppImages.termsIcon, height: 20.0, width: 20.0),
+              //const SizedBox(width: 10.0),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Thanks for your \nregistration.',
+                      style: TextStyle(
+                        fontSize: 30.0,
+                        color: AppColors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 14.0),
+                    const Text(
+                      'We have just sent you via email and SMS the temporary code to access.Please check your inbox or mobile phone and sign in.',
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: AppColors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 18.0),
+                    const Text(
+                      'Attention, the code will expire in 5',
+                      style: TextStyle(
+                        fontSize: 13.0,
+                        color: AppColors.black,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Container(
+                      height: 35.0,
+                      width: width,
+                      margin: const EdgeInsets.only(right: 16.0, top: 8.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3.0),
+                        border: Border.all(
+                          color: AppColors.primary,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: TextFormField(
+                        controller: codeController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'code',
+                          contentPadding:
+                              EdgeInsets.only(left: 16.0, bottom: 16.0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 16.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          CustomButton(
+                            onTap: () {
+                              otp();
+                            },
+                            btnText: 'Submit',
+                            width: 80.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        loginResend();
+                      },
+                      child: const Text(
+                        'Send me again the verification code',
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.w600,
+                          fontStyle: FontStyle.normal,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
-      ),
-    ],
-  );
+      );
 }
