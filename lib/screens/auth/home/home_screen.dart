@@ -101,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
           error = t;
         });
       } else {
+        EasyLoading.dismiss();
         showErrorToast(fToast: fToast, isError: true, msg: e.message);
       }
     }
@@ -150,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
         prefs.setString('token', body["AccessToken"]);
         prefs.setString('refresh_token', "yes");
         prefs.setBool('login', true);
-        Get.to(const MyAppointmentsScreen());
+        Get.offAll(const MyAppointmentsScreen());
         print(res.data);
       });
     } on DioError catch (e) {
