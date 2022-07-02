@@ -104,12 +104,12 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
 
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
-      _markers.add(
-        const Marker(
-          markerId: MarkerId('id-1'),
-          position: LatLng(30.587968, 60.814708),
-        ),
-      );
+      // _markers.add(
+      //   const Marker(
+      //     markerId: MarkerId('id-1'),
+      //     position: LatLng(30.587968, 60.814708),
+      //   ),
+      // );
     });
   }
 
@@ -453,19 +453,19 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12.0),
-                  child: kIsWeb
-                      ? Text('Map plugin')
-                      : GoogleMap(
-                          onMapCreated: _onMapCreated,
-                          //markers: _markers,
-                          initialCameraPosition: const CameraPosition(
-                            target: LatLng(30.587968, 60.814708),
-                            //zoom: 5,
-                          ),
-                        ),
-                ),
+                // child: ClipRRect(
+                //   borderRadius: BorderRadius.circular(12.0),
+                //   child: kIsWeb
+                //       ? Text('Map plugin')
+                //       : GoogleMap(
+                //           onMapCreated: _onMapCreated,
+                //           //markers: _markers,
+                //           initialCameraPosition: const CameraPosition(
+                //             target: LatLng(30.587968, 60.814708),
+                //             //zoom: 5,
+                //           ),
+                //         ),
+                // ),
               ),
             ),
             doctorlist.isEmpty
