@@ -43,6 +43,8 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   bool isPast = false;
   late SharedPreferences prefs;
   List appointments = [];
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      GlobalKey<RefreshIndicatorState>();
 
   void planActive() {
     setState(() {
@@ -58,7 +60,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     });
   }
 
-  void getAppointments() async {
+  Future<void> getAppointments() async {
     appointments.clear();
     EasyLoading.show(status: 'loading...');
     prefs = await SharedPreferences.getInstance();
@@ -79,7 +81,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
       });
     } on DioError catch (e) {
       EasyLoading.dismiss();
-      print(e.response!.statusCode);
+      //print(e.response!.statusCode);
     }
   }
 
@@ -258,28 +260,19 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                   ),
                   Expanded(
                     flex: 2,
-                    child: CustomButton(
-                      onTap: () {
-                        Get.to(const BookAnAppointmentScreen());
-                      },
-                      width: 80.0,
-                      borderColor: AppColors.lightBlue,
-                      btnText: "Book",
-                      // child: Row(
-                      //   crossAxisAlignment: CrossAxisAlignment.center,
-                      //   mainAxisAlignment: MainAxisAlignment.center,
-                      //   children: const [
-                      //     Icon(Icons.group_outlined, color: AppColors.white, size: 20.0),
-                      //     SizedBox(width: 8.0),
-                      //     Text('Book',
-                      //       style: TextStyle(
-                      //         fontSize: 15.0,
-                      //         fontWeight: FontWeight.w500,
-                      //         color: AppColors.white,
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
+                    child: ElevatedButton.icon(
+                      onPressed: () =>
+                          {Get.to(const BookAnAppointmentScreen())},
+                      icon: const Icon(Icons.group_outlined,
+                          color: AppColors.white, size: 20.0),
+                      label: const Text('Book'),
+                      style: ElevatedButton.styleFrom(
+                        primary: AppColors.secondary,
+                        side: BorderSide(color: AppColors.secondary),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6.0),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -289,12 +282,27 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
             /// detail Box
             const SizedBox(height: 16.0),
 
-            appointments.isEmpty
-                ? Center(child: CircularProgressIndicator())
-                : Column(
-                    children: List.generate(
-                        appointments.length,
-                        (index) => DoctorDetailsBox(
+            RefreshIndicator(
+                color: Colors.white,
+                backgroundColor: AppColors.secondary,
+                strokeWidth: 3.0,
+                onRefresh: () {
+                  getAppointments();
+                  return Future<void>.delayed(const Duration(seconds: 3));
+                },
+                child: appointments.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : SizedBox(
+                        height: 600.0,
+                        child: ListView.separated(
+                          separatorBuilder: (BuildContext context, int index) {
+                            return const SizedBox(
+                              height: 5,
+                            );
+                          },
+                          itemCount: appointments.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return DoctorDetailsBox(
                               width: width,
                               id: appointments[index]['DoctorAvailability']
                                   ['Doctor']['Id'],
@@ -314,34 +322,27 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                               startTime: appointments[index]
                                   ['DoctorAvailability']['StartTime'],
                               patientNotes: appointments[index]['PatientNotes'],
-                            )),
-                  ),
+                            );
+                          },
+                        ),
+                      )),
 
             /// book and appointment button
             const SizedBox(height: 24.0),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: height * 0.1),
-              child: CustomButton(
-                onTap: () {
-                  Get.to(const BookAnAppointmentScreen());
-                },
-                borderColor: AppColors.lightBlue,
-                btnText: "Book an appointment",
-                // child: Row(
-                //   crossAxisAlignment: CrossAxisAlignment.center,
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: const [
-                //     Icon(Icons.group_outlined, color: AppColors.white, size: 20.0),
-                //     SizedBox(width: 8.0),
-                //     Text('Book an appointment',
-                //       style: TextStyle(
-                //         fontSize: 15.0,
-                //         fontWeight: FontWeight.w500,
-                //         color: AppColors.white,
-                //       ),
-                //     ),
-                //   ],
-                // ),
+              child: ElevatedButton.icon(
+                onPressed: () => {Get.to(const BookAnAppointmentScreen())},
+                icon: const Icon(Icons.group_outlined,
+                    color: AppColors.white, size: 20.0),
+                label: const Text('Book an appointment'),
+                style: ElevatedButton.styleFrom(
+                  primary: AppColors.secondary,
+                  side: BorderSide(color: AppColors.secondary),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                ),
               ),
             ),
           ],
@@ -668,30 +669,34 @@ class DoctorDetailsBox extends StatelessWidget {
           ),
 
           /// location address center
-          const SizedBox(height: 8.0),
-          const Icon(Icons.location_on_outlined, color: AppColors.primary),
-          const SizedBox(height: 2.0),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: locationName! + ' -',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.black,
-                  ),
+          const SizedBox(height: 15.0),
+          Row(
+            children: [
+              const Icon(Icons.location_on_outlined, color: AppColors.primary),
+              const SizedBox(height: 2.0),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: locationName! + ' -',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.black,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' ' + locationAddress!,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.black,
+                      ),
+                    ),
+                  ],
                 ),
-                TextSpan(
-                  text: ' ' + locationAddress!,
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.black,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
 
           /// brief description text
