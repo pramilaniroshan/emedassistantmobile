@@ -4,6 +4,7 @@ import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/doctor_appointment/component/appoinment_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -91,6 +92,27 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     EasyLoading.showSuccess('Done');
   }
 
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+            title: const Text('Are you sure?'),
+            content: const Text('Do you want to exit an App'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: new Text('No'),
+              ),
+              TextButton(
+                onPressed: () => SystemNavigator.pop(),
+                child: new Text('Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -147,6 +169,10 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
+            WillPopScope(
+              onWillPop: _onWillPop,
+              child: const Text(''),
+            ),
 
             /// planned and past tab
             Padding(
@@ -329,18 +355,20 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
 
             /// book and appointment button
             const SizedBox(height: 24.0),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: height * 0.1),
-              child: ElevatedButton.icon(
-                onPressed: () => {Get.to(const BookAnAppointmentScreen())},
-                icon: const Icon(Icons.group_outlined,
-                    color: AppColors.white, size: 20.0),
-                label: const Text('Book an appointment'),
-                style: ElevatedButton.styleFrom(
-                  primary: AppColors.secondary,
-                  side: BorderSide(color: AppColors.secondary),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6.0),
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: height * 0.1),
+                child: ElevatedButton.icon(
+                  onPressed: () => {Get.to(const BookAnAppointmentScreen())},
+                  icon: const Icon(Icons.group_outlined,
+                      color: AppColors.white, size: 20.0),
+                  label: const Text('Book an appointment'),
+                  style: ElevatedButton.styleFrom(
+                    primary: AppColors.secondary,
+                    side: BorderSide(color: AppColors.secondary),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
                   ),
                 ),
               ),
