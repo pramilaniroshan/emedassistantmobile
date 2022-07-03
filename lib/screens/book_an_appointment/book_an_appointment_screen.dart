@@ -103,14 +103,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
   }
 
   void _onMapCreated(GoogleMapController controller) {
-    setState(() {
-      // _markers.add(
-      //   const Marker(
-      //     markerId: MarkerId('id-1'),
-      //     position: LatLng(30.587968, 60.814708),
-      //   ),
-      // );
-    });
+    //TODO
   }
 
   final myFormat = DateFormat('yyyy-MM-dd');
@@ -127,7 +120,6 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
       setState(() {
         date = picked ?? date;
       });
-      print(date);
     }
 
     double height = MediaQuery.of(context).size.height;
@@ -448,24 +440,39 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.25,
+                height: MediaQuery.of(context).size.height * 0.5,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.0),
                 ),
-                // child: ClipRRect(
-                //   borderRadius: BorderRadius.circular(12.0),
-                //   child: kIsWeb
-                //       ? Text('Map plugin')
-                //       : GoogleMap(
-                //           onMapCreated: _onMapCreated,
-                //           //markers: _markers,
-                //           initialCameraPosition: const CameraPosition(
-                //             target: LatLng(30.587968, 60.814708),
-                //             //zoom: 5,
-                //           ),
-                //         ),
-                // ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.0),
+                  child: kIsWeb
+                      ? Text('Map plugin')
+                      : GoogleMap(
+                          onMapCreated: _onMapCreated,
+                          liteModeEnabled: true,
+                          markers: _markers,
+                          initialCameraPosition: const CameraPosition(
+                            target: LatLng(6.9271, 79.8612),
+                            zoom: 11,
+                          ),
+                          onTap: (latlang) {
+                            setState(() {
+                              _markers.add(
+                                Marker(
+                                    markerId: MarkerId('id-1'),
+                                    position: LatLng(
+                                        latlang.latitude, latlang.longitude),
+                                    infoWindow: InfoWindow(
+                                        title: 'Title',
+                                        snippet: "${latlang.latitude}" +
+                                            "${latlang.longitude}")),
+                              );
+                            });
+                          },
+                        ),
+                ),
               ),
             ),
             doctorlist.isEmpty
