@@ -8,6 +8,7 @@ class DateRow extends StatelessWidget {
   final String? dayText;
   final String? dateText;
   final String? timeSlotText;
+  final String? timeSlot;
   final String id;
   final double? consultationFee;
   final String? title;
@@ -20,6 +21,7 @@ class DateRow extends StatelessWidget {
       this.dayText = ', ',
       this.dateText = ' ',
       this.timeSlotText = '',
+      this.timeSlot = '',
       this.consultationFee = 0,
       this.title,
       this.doctorFullName = '',
@@ -37,6 +39,7 @@ class DateRow extends StatelessWidget {
             dayText,
             dateText,
             timeSlotText,
+            timeSlot,
             consultationFee,
             title,
             doctorFullName,

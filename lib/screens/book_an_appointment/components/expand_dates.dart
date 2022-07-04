@@ -87,6 +87,7 @@ class _ExpandDatesState extends State<ExpandDates> {
                             dateText: dateConvert(widget.freeSlots[index])[1],
                             timeSlotText:
                                 dateConvert(widget.freeSlots[index])[2],
+                            timeSlot: widget.freeSlots[index],
                             id: widget.id,
                             title: widget.doctorTitle,
                             doctorFullName: widget.doctorFullName,

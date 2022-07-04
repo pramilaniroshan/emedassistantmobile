@@ -17,6 +17,7 @@ class PatientBookingScreen extends StatefulWidget {
   final String? dayText;
   final String? dateText;
   final String? timeSlotText;
+  final String? timeSlot;
   final String id;
   final double? consultationFee;
   final String? title;
@@ -28,6 +29,7 @@ class PatientBookingScreen extends StatefulWidget {
       this.dayText,
       this.dateText,
       this.timeSlotText,
+      this.timeSlot,
       this.consultationFee,
       this.title,
       this.doctorFullName,
@@ -56,7 +58,7 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
       dio.options.headers["authorization"] = "Bearer " + token;
       await dio.post(Constants().getBaseUrl() + '/Patient/Appointment', data: {
         "DoctorAvailabilityId": widget.id,
-        "Time": widget.timeSlotText,
+        "Time": widget.timeSlot,
         "PatientNotes": descController.text,
       }).then((res) {
         setState(() {});
@@ -67,6 +69,13 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
       print(e.response!.data);
       EasyLoading.showError(e.response!.data);
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print(widget.timeSlot);
   }
 
   @override

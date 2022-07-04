@@ -47,7 +47,7 @@ void showErrorToast(
     ),
   );
 
-  fToast!.showToast(
+  fToast?.showToast(
     child: isError ? error : done,
     gravity: ToastGravity.BOTTOM,
     toastDuration: Duration(seconds: 2),
