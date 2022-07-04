@@ -10,6 +10,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
+import 'package:add_2_calendar/add_2_calendar.dart';
 
 import 'package:emedassistantmobile/widgets/custom_button.dart';
 import 'package:emedassistantmobile/config/app_colors.dart';
@@ -44,6 +45,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   bool isPast = false;
   late SharedPreferences prefs;
   List appointments = [];
+  late final Event event;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
 
@@ -765,7 +767,25 @@ class DoctorDetailsBox extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 2.0),
             child: CustomButton(
-              onTap: () {},
+              onTap: () {
+                Add2Calendar.addEvent2Cal(Event(
+                  title: 'Event title',
+                  description: 'Event description',
+                  location: 'Event location',
+                  startDate: DateTime.now(),
+                  endDate: DateTime.now().add(const Duration(minutes: 30)),
+                  iosParams: const IOSParams(
+                    reminder: Duration(
+                        /* Ex. hours:1 */), // on iOS, you can set alarm notification after your event.
+                  ),
+                  androidParams: const AndroidParams(
+                    emailInvites: [
+                      'test@t.com'
+                    ], // on Android, you can add invite emails to your event.
+                  ),
+                ));
+                print('calander_1');
+              },
               btnText: 'Add to my calender',
               height: 30.0,
               width: MediaQuery.of(context).size.width / 3,
