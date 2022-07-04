@@ -1,7 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
-import 'package:emedassistantmobile/screens/doctor_appointment/doctor_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:emedassistantmobile/widgets/custom_field.dart';
 import 'package:flutter/material.dart';
@@ -322,7 +321,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
               padding: const EdgeInsets.only(left: 16.0),
               child: GestureDetector(
                 onTap: () {
-                  Get.to(const DoctorAppointmentScreen());
+                  Get.to(const MyAppointmentsScreen());
                 },
                 child: const Text(
                   'Create your profile',

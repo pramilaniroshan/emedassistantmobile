@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
-import 'package:emedassistantmobile/screens/doctor_appointment/component/appoinment_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
