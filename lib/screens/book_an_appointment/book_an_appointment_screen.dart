@@ -61,7 +61,6 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 

@@ -1,20 +1,10 @@
+import 'package:emedassistantmobile/controller/patientController.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:get/get.dart';
 import '../config/app_colors.dart';
-import '../services/get_patient_profile.dart';
 
 class PatientDrawerAction extends StatelessWidget {
   PatientDrawerAction({Key? key}) : super(key: key);
-  late SharedPreferences prefs;
-  String? firstname;
-
-  void getProfile() async {
-    prefs = await SharedPreferences.getInstance();
-    firstname = prefs.getString('firstName');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,12 +16,16 @@ class PatientDrawerAction extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            'Vibhu',
-            style: TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.w500,
-              color: AppColors.black,
+          GetBuilder<PatientController>(
+            // You can initialize your controller here the first time. Don't use init in your other GetBuilders of same controller
+            // GetX/Obx is reactive (streams) while GetBuilder only rebuilds on update()
+            builder: (s) => Text(
+              '${s.firstName}',
+              style: TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                color: AppColors.black,
+              ),
             ),
           ),
           SizedBox(width: 12.0),

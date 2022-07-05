@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:emedassistantmobile/controller/patientController.dart';
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
@@ -20,6 +21,7 @@ import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 
 import '../../config/constants.dart';
+import '../../controller/countController.dart';
 
 class MyAppointmentsScreen extends StatefulWidget {
   const MyAppointmentsScreen({Key? key}) : super(key: key);
@@ -51,6 +53,8 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   late final Event event;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+
+  final PatientController countController = Get.put(PatientController());
 
   void planActive() {
     setState(() {
