@@ -95,14 +95,14 @@ class _HomeScreenState extends State<HomeScreen> {
       if (e.response != null) {
         EasyLoading.dismiss();
         var t = e.response!.data["Error"];
-        showErrorToast(
-            fToast: fToast, isError: true, msg: e.response!.data["Error"]);
+        // showErrorToast(
+        //     fToast: fToast, isError: true, msg: e.response!.data["Error"]);
         setState(() {
           error = t;
         });
       } else {
         EasyLoading.dismiss();
-        showErrorToast(fToast: fToast, isError: true, msg: e.message);
+        //showErrorToast(fToast: fToast, isError: true, msg: e.message);
       }
     }
   }
