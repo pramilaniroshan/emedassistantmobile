@@ -74,12 +74,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       if (e.response != null) {
         EasyLoading.dismiss();
         var t = e.response!.data["Error"];
-        showErrorToast(
-            fToast: fToast, isError: true, msg: e.response!.data["Error"]);
+        //showErrorToast(
+        //  fToast: fToast, isError: true, msg: e.response!.data["Error"]);
         setState(() {});
       } else {
         EasyLoading.dismiss();
-        showErrorToast(fToast: fToast, isError: true, msg: e.message);
+        //showErrorToast(fToast: fToast, isError: true, msg: e.message);
       }
     }
   }
