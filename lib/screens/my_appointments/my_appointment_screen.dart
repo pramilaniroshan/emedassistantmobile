@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
+import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -63,6 +64,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   }
 
   Future<void> getAppointments() async {
+    EasyLoading.showInfo('status');
     appointments.clear();
     EasyLoading.show(status: 'loading...');
     prefs = await SharedPreferences.getInstance();
@@ -79,7 +81,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
           appointments = res.data['Data']['Data'];
         });
         EasyLoading.dismiss();
-        print(appointments[0]['DoctorAvailability']['Doctor']);
+        //print(appointments[0]['DoctorAvailability']['Doctor']);
       });
     } on DioError catch (e) {
       EasyLoading.dismiss();
@@ -288,8 +290,11 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                   Expanded(
                     flex: 2,
                     child: ElevatedButton.icon(
-                      onPressed: () =>
-                          {Get.to(const BookAnAppointmentScreen())},
+                      onPressed: () => {
+                        Get.to(const BookAnAppointmentScreen(),
+                            duration: Duration(seconds: 1),
+                            transition: Transition.downToUp)
+                      },
                       icon: const Icon(Icons.group_outlined,
                           color: AppColors.white, size: 20.0),
                       label: const Text('Book'),
@@ -318,7 +323,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                   return Future<void>.delayed(const Duration(seconds: 3));
                 },
                 child: appointments.isEmpty
-                    ? const Center(child: CircularProgressIndicator())
+                    ? const Center(child: Text('No any data to display'))
                     : SizedBox(
                         height: 600.0,
                         child: ListView.separated(
@@ -398,7 +403,9 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
           ),
           const SizedBox(height: 20.0),
           ListTile(
-            onTap: () {},
+            onTap: () {
+              Get.to(QRViewExample());
+            },
             leading: Padding(
               padding: const EdgeInsets.only(top: 6.0, left: 12.0),
               child: SvgPicture.asset(
