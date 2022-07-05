@@ -142,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
         "Otp": codeController.text,
         "DeviceId": "210"
       }).then((res) async {
-        showErrorToast(fToast: fToast, isError: false, msg: 'Done');
+        //showErrorToast(fToast: fToast, isError: false, msg: 'Done');
         final body = res.data["Data"];
         prefs = await SharedPreferences.getInstance();
         prefs.setString('token', body["AccessToken"]);
