@@ -148,7 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
         prefs.setString('token', body["AccessToken"]);
         prefs.setString('refresh_token', "yes");
         prefs.setBool('login', true);
-        getPatientProfile();
         Get.offAll(const MyAppointmentsScreen());
         print(res.data);
       });
