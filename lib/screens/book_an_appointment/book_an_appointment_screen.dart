@@ -57,6 +57,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
   ];
 
   final Set<Marker> _markers = {};
+  Set<Circle> circles = {};
 
   @override
   void initState() {
@@ -451,8 +452,12 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                       ? Text('Map plugin')
                       : GoogleMap(
                           onMapCreated: _onMapCreated,
-                          liteModeEnabled: true,
+                          liteModeEnabled: false,
+                          myLocationButtonEnabled: true,
+                          scrollGesturesEnabled: true,
+                          rotateGesturesEnabled: true,
                           markers: _markers,
+                          circles: circles,
                           initialCameraPosition: const CameraPosition(
                             target: LatLng(6.9271, 79.8612),
                             zoom: 11,
@@ -470,6 +475,14 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                                             "${latlang.longitude}")),
                               );
                             });
+                            Set.from([
+                              Circle(
+                                  circleId: CircleId('id-1'),
+                                  center: LatLng(
+                                      latlang.latitude, latlang.longitude),
+                                  radius: 4000,
+                                  fillColor: Colors.red)
+                            ]);
                           },
                         ),
                 ),
@@ -524,7 +537,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
           const SizedBox(height: 20.0),
           ListTile(
             onTap: () {
-              Get.to(const ScanQrScreen());
+              //Get.to();
             },
             leading: Padding(
               padding: const EdgeInsets.only(top: 6.0, left: 12.0),
