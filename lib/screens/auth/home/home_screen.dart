@@ -142,13 +142,12 @@ class _HomeScreenState extends State<HomeScreen> {
         "Otp": codeController.text,
         "DeviceId": "210"
       }).then((res) async {
-        showErrorToast(fToast: fToast, isError: false, msg: 'Done');
+        //showErrorToast(fToast: fToast, isError: false, msg: 'Done');
         final body = res.data["Data"];
         prefs = await SharedPreferences.getInstance();
         prefs.setString('token', body["AccessToken"]);
         prefs.setString('refresh_token', "yes");
         prefs.setBool('login', true);
-        getPatientProfile();
         Get.offAll(const MyAppointmentsScreen());
         print(res.data);
       });

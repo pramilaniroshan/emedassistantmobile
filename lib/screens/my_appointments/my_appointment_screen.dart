@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:emedassistantmobile/controller/patientController.dart';
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
@@ -20,6 +22,7 @@ import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 
 import '../../config/constants.dart';
+import '../../controller/countController.dart';
 
 class MyAppointmentsScreen extends StatefulWidget {
   const MyAppointmentsScreen({Key? key}) : super(key: key);
@@ -51,6 +54,8 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   late final Event event;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       GlobalKey<RefreshIndicatorState>();
+
+  final PatientController countController = Get.put(PatientController());
 
   void planActive() {
     setState(() {
@@ -123,6 +128,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    getPatientProfile();
     getAppointments();
   }
 
@@ -350,6 +356,8 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                                   ['LocationName'],
                               startTime: appointments[index]
                                   ['DoctorAvailability']['StartTime'],
+                              endTime: appointments[index]['DoctorAvailability']
+                                  ['EndTime'],
                               patientNotes: appointments[index]['PatientNotes'],
                             );
                           },
@@ -415,6 +423,7 @@ class DoctorDetailsBox extends StatelessWidget {
     this.locationName,
     this.locationAddress,
     this.startTime,
+    this.endTime,
     this.patientNotes,
     Key? key,
     required this.width,
@@ -428,8 +437,22 @@ class DoctorDetailsBox extends StatelessWidget {
   final String? locationName;
   final String? locationAddress;
   final String? startTime;
+  final String? endTime;
   final String? patientNotes;
   //void VoidCallback();
+
+  List dateConvert(String date) {
+    var dateFormat =
+        DateFormat('EEE, MMM d ,y,h:mm a'); // you can change the format here
+    var utcDate =
+        dateFormat.format(DateTime.parse(date)); // pass the UTC time here
+    var localDate = dateFormat.parse(utcDate, true).toLocal().toString();
+    String createdDate = dateFormat.format(DateTime.parse(localDate));
+    // you will local time
+    List<String> dayList = createdDate.split(",");
+    print(dayList);
+    return dayList;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -459,7 +482,11 @@ class DoctorDetailsBox extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      startTime!,
+                      dateConvert(startTime ?? '')[0] +
+                          ' ' +
+                          dateConvert(startTime ?? '')[1] +
+                          ' ' +
+                          dateConvert(startTime ?? '')[2],
                       style: TextStyle(
                         fontSize: 14.0,
                         color: AppColors.black,
@@ -468,7 +495,7 @@ class DoctorDetailsBox extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      '13:15',
+                      dateConvert(startTime ?? '')[3],
                       style: TextStyle(
                         fontSize: 24.0,
                         color: AppColors.black,
@@ -477,7 +504,7 @@ class DoctorDetailsBox extends StatelessWidget {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      '16:15',
+                      dateConvert(endTime ?? '')[3],
                       style: TextStyle(
                         fontSize: 20.0,
                         color: AppColors.primary,
@@ -590,8 +617,8 @@ class DoctorDetailsBox extends StatelessWidget {
               onTap: () {
                 Add2Calendar.addEvent2Cal(Event(
                   title: 'Event title',
-                  description: 'Event description',
-                  location: 'Event location',
+                  description: patientNotes ?? 'Event description',
+                  location: locationName ?? 'Event location',
                   startDate: DateTime.now(),
                   endDate: DateTime.now().add(const Duration(minutes: 30)),
                   iosParams: const IOSParams(
@@ -604,7 +631,6 @@ class DoctorDetailsBox extends StatelessWidget {
                     ], // on Android, you can add invite emails to your event.
                   ),
                 ));
-                print('calander_1');
               },
               btnText: 'Add to my calender',
               height: 30.0,
