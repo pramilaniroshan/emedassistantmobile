@@ -2,6 +2,7 @@ import 'package:emedassistantmobile/models/test_model.dart';
 import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/profile/create_profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,6 +20,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../config/constants.dart';
+import '../../../services/get_patient_profile.dart';
 import '../../../widgets/toast.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -45,18 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _otpFormKey = GlobalKey<FormState>();
   FToast? fToast;
 
-//    void get_posts () {
-//    var dio = Dio();
-//    dio.get('https://jsonplaceholder.typicode.com/posts',).then((res) {
-//      var ress = res.data;
-//      for (var item in ress){
-//        posts.add(Posts.fromJson(item));
-//        print(posts[0].title);
-//      }
-//    });
-//    //print(response);
-//  }
-
   void check_if_already_login() async {
     prefs = await SharedPreferences.getInstance();
 
@@ -80,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }).then((res) {
         if (res.statusCode == 200) {
           EasyLoading.dismiss();
+          EasyLoading.showSuccess('Code sent');
           //showErrorToast(fToast: fToast, isError: false, msg: 'Code sent');
           Get.defaultDialog(
             backgroundColor: AppColors.lightBackground,
@@ -95,6 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (e.response != null) {
         EasyLoading.dismiss();
         var t = e.response!.data["Error"];
+        EasyLoading.showError(
+            e.response!.data["Error"] ?? 'Something went wrong');
         // showErrorToast(
         //     fToast: fToast, isError: true, msg: e.response!.data["Error"]);
         setState(() {
@@ -102,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       } else {
         EasyLoading.dismiss();
+        EasyLoading.showError('Something went wrong');
         //showErrorToast(fToast: fToast, isError: true, msg: e.message);
       }
     }
@@ -118,7 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
         "Application": 0
       }).then((res) {
         if (res.statusCode == 200) {
-          showErrorToast(fToast: fToast, isError: false, msg: 'Code sent');
+          //showErrorToast(fToast: fToast, isError: false, msg: 'Code sent');
+          EasyLoading.showSuccess('Code Sent');
         }
       });
     } on DioError catch (e) {
@@ -126,13 +121,15 @@ class _HomeScreenState extends State<HomeScreen> {
       // that falls out of the range of 2xx and is also not 304.
       if (e.response != null) {
         var t = e.response!.data["Error"];
-        showErrorToast(
-            fToast: fToast, isError: true, msg: e.response!.data["Error"]);
+        EasyLoading.showError(
+            e.response!.data["Error"] ?? 'Something went wrong');
+        // showErrorToast(
+        //     fToast: fToast, isError: true, msg: e.response!.data["Error"]);
         setState(() {
           error = t;
         });
       } else {
-        showErrorToast(fToast: fToast, isError: true, msg: e.message);
+        EasyLoading.showError('Something went wrong');
       }
     }
   }
@@ -151,6 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
         prefs.setString('token', body["AccessToken"]);
         prefs.setString('refresh_token', "yes");
         prefs.setBool('login', true);
+        getPatientProfile();
         Get.offAll(const MyAppointmentsScreen());
         print(res.data);
       });
@@ -159,9 +157,32 @@ class _HomeScreenState extends State<HomeScreen> {
           'Remaining' +
           '${e.response!.data['Data']}' +
           'Attempts';
-      showErrorToast(
-          fToast: fToast, isError: true, msg: e.response!.data['Error']);
+      EasyLoading.showError(
+          e.response!.data['Error'] ?? 'Something went wrong');
+      // showErrorToast(
+      //     fToast: fToast, isError: true, msg: e.response!.data['Error']);
     }
+  }
+
+  Future<bool> _onWillPop() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => new AlertDialog(
+            title: const Text('Are you sure?'),
+            content: const Text('Do you want to exit an App'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: new Text('No'),
+              ),
+              TextButton(
+                onPressed: () => SystemNavigator.pop(),
+                child: new Text('Yes'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
   }
 
   @override
@@ -171,8 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // get_posts ();
     // print(isemailtab);
     check_if_already_login();
-    fToast = FToast();
-    fToast!.init(context);
+    // fToast = FToast();
+    // fToast!.init(context);
   }
 
   @override
@@ -357,6 +378,10 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              WillPopScope(
+                onWillPop: _onWillPop,
+                child: const Text(''),
+              ),
               Image.asset(
                 AppImages.homeImage,
                 width: width,

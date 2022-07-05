@@ -59,6 +59,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       }).then((res) {
         if (res.statusCode == 200) {
           EasyLoading.dismiss();
+          EasyLoading.showSuccess('Code Sent');
           //showErrorToast(fToast: fToast, isError: false, msg: 'Code sent');
           Get.defaultDialog(
             backgroundColor: AppColors.lightBackground,
@@ -74,11 +75,15 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       if (e.response != null) {
         EasyLoading.dismiss();
         var t = e.response!.data["Error"];
+        EasyLoading.showError(
+            e.response!.data["Error"] ?? 'Something went wrong');
         //showErrorToast(
         //  fToast: fToast, isError: true, msg: e.response!.data["Error"]);
         setState(() {});
       } else {
         EasyLoading.dismiss();
+        EasyLoading.showError(
+            e.response!.data["Error"] ?? 'Something went wrong');
         //showErrorToast(fToast: fToast, isError: true, msg: e.message);
       }
     }
@@ -92,7 +97,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         "Otp": codeController.text,
         "DeviceId": "210"
       }).then((res) async {
-        showErrorToast(fToast: fToast, isError: false, msg: 'Done');
+        //showErrorToast(fToast: fToast, isError: false, msg: 'Done');
+        EasyLoading.showSuccess('Done');
         final body = res.data["Data"];
         prefs = await SharedPreferences.getInstance();
         prefs.setString('token', body["AccessToken"]);
@@ -105,8 +111,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           'Remaining' +
           '${e.response!.data['Data']}' +
           'Attempts';
-      showErrorToast(
-          fToast: fToast, isError: true, msg: e.response!.data['Error']);
+      EasyLoading.showError(
+          e.response!.data["Error"] ?? 'Something went wrong');
+      // showErrorToast(
+      //     fToast: fToast, isError: true, msg: e.response!.data['Error']);
     }
   }
 
@@ -121,17 +129,21 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         "Application": 0
       }).then((res) {
         if (res.statusCode == 200) {
-          showErrorToast(fToast: fToast, isError: false, msg: 'Code sent');
+          // showErrorToast(fToast: fToast, isError: false, msg: 'Code sent');
+          EasyLoading.showSuccess('Code Sent');
         }
       });
     } on DioError catch (e) {
       if (e.response != null) {
         var t = e.response!.data["Error"];
-        showErrorToast(
-            fToast: fToast, isError: true, msg: e.response!.data["Error"]);
+        // showErrorToast(
+        //     fToast: fToast, isError: true, msg: e.response!.data["Error"]);
+        EasyLoading.showError(
+            e.response!.data["Error"] ?? 'Something went wrong');
         setState(() {});
       } else {
-        showErrorToast(fToast: fToast, isError: true, msg: e.message);
+        EasyLoading.showError(
+            e.response!.data["Error"] ?? 'Something went wrong');
       }
     }
   }

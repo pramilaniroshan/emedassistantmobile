@@ -1,6 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
 import 'package:emedassistantmobile/widgets/custom_button.dart';
+import 'package:emedassistantmobile/widgets/drawer.dart';
+import 'package:emedassistantmobile/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,7 +16,6 @@ import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 import '../../config/constants.dart';
 import '../../widgets/custom_field.dart';
-import 'components/doctor_availability_dialog.dart';
 import 'components/search_doctor_box.dart';
 
 class BookAnAppointmentScreen extends StatefulWidget {
@@ -136,15 +136,9 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
           child: SvgPicture.asset(AppImages.eMedLogo),
         ),
         leadingWidth: 110.0,
-        actions: [
-          menuButton(),
-        ],
+        actions: [PatientDrawerAction()],
       ),
-      endDrawer: Drawer(
-        backgroundColor: AppColors.white,
-        elevation: 0.0,
-        child: endDrawerData(height),
-      ),
+      endDrawer: PatientDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

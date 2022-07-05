@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
+import 'package:emedassistantmobile/services/get_patient_profile.dart';
+import 'package:emedassistantmobile/widgets/drawer.dart';
+import 'package:emedassistantmobile/widgets/user_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -140,17 +143,11 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
           child: SvgPicture.asset(AppImages.eMedLogo),
         ),
         leadingWidth: 110.0,
-        actions: [
-          menuButton(),
-        ],
+        actions: [PatientDrawerAction()],
       ),
 
       /// end drawer
-      endDrawer: Drawer(
-        backgroundColor: AppColors.white,
-        elevation: 0.0,
-        child: endDrawerData(height),
-      ),
+      endDrawer: PatientDrawer(),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(bottom: 40.0),
@@ -384,189 +381,6 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
       ),
     );
   }
-
-  Widget endDrawerData(height) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 40.0),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: IconButton(
-              onPressed: () {
-                Get.back();
-              },
-              icon: SvgPicture.asset(
-                AppImages.closeIcon,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20.0),
-          ListTile(
-            onTap: () {
-              Get.to(QRViewExample());
-            },
-            leading: Padding(
-              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-              child: SvgPicture.asset(
-                AppImages.supportIcon,
-                height: 13.0,
-                width: 13.0,
-                fit: BoxFit.scaleDown,
-                color: AppColors.secondary,
-              ),
-            ),
-            title: const Align(
-              alignment: Alignment(-1.3, 0),
-              child: Text(
-                'Support',
-                style: TextStyle(
-                  fontSize: 21.0,
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ),
-          ListTile(
-            onTap: () {},
-            leading: Padding(
-              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-              child: SvgPicture.asset(
-                AppImages.contactIcon,
-                height: 13.0,
-                width: 13.0,
-                fit: BoxFit.scaleDown,
-                color: AppColors.secondary,
-              ),
-            ),
-            title: const Align(
-              alignment: Alignment(-1.3, 0),
-              child: Text(
-                'Contact',
-                style: TextStyle(
-                  fontSize: 21.0,
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ),
-          ListTile(
-            onTap: () {},
-            leading: Padding(
-              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-              child: SvgPicture.asset(
-                AppImages.termsIcon,
-                height: 13.0,
-                width: 13.0,
-                fit: BoxFit.scaleDown,
-                color: AppColors.secondary,
-              ),
-            ),
-            title: const Align(
-              alignment: Alignment(-1.3, 0),
-              child: Text(
-                'Terms',
-                style: TextStyle(
-                  fontSize: 21.0,
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ),
-          ListTile(
-            onTap: () async {
-              prefs = await SharedPreferences.getInstance();
-              print(prefs.getString("token"));
-            },
-            leading: Padding(
-              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-              child: SvgPicture.asset(
-                AppImages.linkIcon,
-                height: 13.0,
-                width: 13.0,
-                fit: BoxFit.scaleDown,
-                color: AppColors.secondary,
-              ),
-            ),
-            title: const Align(
-              alignment: Alignment(-1.3, 0),
-              child: Text(
-                'eMed.com',
-                style: TextStyle(
-                  fontSize: 21.0,
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: height * 0.06),
-          ListTile(
-            onTap: () async {
-              prefs = await SharedPreferences.getInstance();
-              prefs.clear();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logged out!'),
-                  backgroundColor: AppColors.lightBlue,
-                ),
-              );
-              Get.to(const HomeScreen());
-            },
-            leading: Padding(
-              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-              child: SvgPicture.asset(
-                AppImages.linkIcon,
-                height: 13.0,
-                width: 13.0,
-                fit: BoxFit.scaleDown,
-                color: AppColors.secondary,
-              ),
-            ),
-            title: const Align(
-              alignment: Alignment(-1.3, 0),
-              child: Text(
-                ' Log out',
-                style: TextStyle(
-                  fontSize: 21.0,
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: height * 0.06),
-          ListTile(
-            onTap: () {},
-            leading: Padding(
-              padding: const EdgeInsets.only(top: 6.0, left: 12.0),
-              child: SvgPicture.asset(
-                AppImages.globeIcon,
-                height: 13.0,
-                width: 13.0,
-                fit: BoxFit.scaleDown,
-                color: AppColors.secondary,
-              ),
-            ),
-            title: const Align(
-              alignment: Alignment(-1.1, 0),
-              child: Text(
-                'English',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-            trailing: const Icon(Icons.keyboard_arrow_down_outlined,
-                color: AppColors.black),
-          ),
-        ],
-      );
 
   Widget menuButton() => TextButton(
         onPressed: () {
