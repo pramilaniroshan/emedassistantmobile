@@ -32,7 +32,8 @@ class ExpandDates extends StatefulWidget {
 
 class _ExpandDatesState extends State<ExpandDates> {
   List dateConvert(String date) {
-    var dateFormat = DateFormat("yMMMEd"); // you can change the format here
+    var dateFormat =
+        DateFormat("yMMMEd").add_jm(); // you can change the format here
     var utcDate =
         dateFormat.format(DateTime.parse(date)); // pass the UTC time here
     var localDate = dateFormat.parse(utcDate, true).toLocal().toString();
