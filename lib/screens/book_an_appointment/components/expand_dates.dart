@@ -33,7 +33,7 @@ class ExpandDates extends StatefulWidget {
 class _ExpandDatesState extends State<ExpandDates> {
   List dateConvert(String date) {
     var dateFormat =
-        DateFormat("yMMMEd").add_jm(); // you can change the format here
+        DateFormat('EEE, MMM d ,y,h:mm a'); // you can change the format here
     var utcDate =
         dateFormat.format(DateTime.parse(date)); // pass the UTC time here
     var localDate = dateFormat.parse(utcDate, true).toLocal().toString();
@@ -87,7 +87,9 @@ class _ExpandDatesState extends State<ExpandDates> {
                             dayText: dateConvert(widget.freeSlots[index])[0],
                             dateText: dateConvert(widget.freeSlots[index])[1],
                             timeSlotText:
-                                dateConvert(widget.freeSlots[index])[2],
+                                dateConvert(widget.freeSlots[index])[2] +
+                                    ' ' +
+                                    dateConvert(widget.freeSlots[index])[3],
                             timeSlot: widget.freeSlots[index],
                             id: widget.id,
                             title: widget.doctorTitle,
@@ -96,14 +98,6 @@ class _ExpandDatesState extends State<ExpandDates> {
                             locationName: widget.locationName,
                             locationAddress: widget.locationAddress,
                           ))),
-          /*DateRow(
-          
-            dayText: 'Monday, ',
-            dateText: '11 Apr ',
-            timeSlotText: '2022 - 9-11am 3°slot',
-            id : '123',
-
-          ),*/
           SizedBox(height: 16.0),
           // Align(
           //   alignment: Alignment.centerRight,
