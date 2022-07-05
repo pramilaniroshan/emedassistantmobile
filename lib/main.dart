@@ -9,22 +9,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 Future<void> main() async {
-// SharedPreferences prefs = await SharedPreferences.getInstance();
-// bool isLoggedIn = true;
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
+  // //prefs.getString('login');
+  // print(prefs.getBool('login'));
+  // print(prefs.getBool('login'));
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Future<SharedPreferences> prefs = SharedPreferences.getInstance();
-    var isLoggedUser = prefs.then((value) {
-      value.setString('counter', "yes");
-      return value.containsKey('counter');
-    });
+    // Future<SharedPreferences> prefs = SharedPreferences.getInstance();
+    // var isLoggedUser = prefs.then((value) {
+    //   value..getBool('login');
+    //   return value..getBool('login');
+    // });
 
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -38,9 +39,7 @@ class MyApp extends StatelessWidget {
           duration: 500,
           splash: SvgPicture.asset(AppImages.eMedLogo,
               height: 50, width: 50, fit: BoxFit.scaleDown),
-          nextScreen: isLoggedUser == true
-              ? const MyAppointmentsScreen()
-              : const HomeScreen(),
+          nextScreen: const HomeScreen(),
           splashTransition: SplashTransition.fadeTransition,
           backgroundColor: Colors.white),
       builder: EasyLoading.init(),
