@@ -12,7 +12,7 @@
   </intent>
 </queries>
    <application
-        android:label="Emed"
+        android:label="eMed Patient"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
