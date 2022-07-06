@@ -1,9 +1,7 @@
 import 'dart:convert';
 
 import 'package:emedassistantmobile/controller/patientController.dart';
-import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
-import 'package:emedassistantmobile/screens/scan_qr/scan_qr_screen.dart';
 import 'package:emedassistantmobile/services/get_patient_profile.dart';
 import 'package:emedassistantmobile/widgets/drawer.dart';
 import 'package:emedassistantmobile/widgets/user_avatar.dart';
@@ -293,11 +291,8 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                   Expanded(
                     flex: 2,
                     child: ElevatedButton.icon(
-                      onPressed: () => {
-                        Get.to(const BookAnAppointmentScreen(),
-                            duration: Duration(seconds: 1),
-                            transition: Transition.downToUp)
-                      },
+                      onPressed: () =>
+                          {Get.to(const BookAnAppointmentScreen())},
                       icon: const Icon(Icons.group_outlined,
                           color: AppColors.white, size: 20.0),
                       label: const Text('Book'),
