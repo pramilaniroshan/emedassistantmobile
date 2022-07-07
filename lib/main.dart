@@ -1,19 +1,22 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 import 'package:emedassistantmobile/screens/auth/home/home_screen.dart';
-import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 Future<void> main() async {
-  // SharedPreferences prefs = await SharedPreferences.getInstance();
-  // //prefs.getString('login');
-  // print(prefs.getBool('login'));
-  // print(prefs.getBool('login'));
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+  runApp(
+    EasyLocalization(
+        supportedLocales: [Locale('en', 'US'), Locale('si', 'LK')],
+        path: 'assets/translations',
+        fallbackLocale: Locale('en', 'US'),
+        child: MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -21,20 +24,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Future<SharedPreferences> prefs = SharedPreferences.getInstance();
-    // var isLoggedUser = prefs.then((value) {
-    //   value..getBool('login');
-    //   return value..getBool('login');
-    // });
-
     return GetMaterialApp(
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       debugShowCheckedModeBanner: false,
       title: 'eMed App',
       theme: Themes.light,
       darkTheme: Themes.dark,
-      //themeMode: ThemeService().theme,
-
-      //home: CreateProfileScreen(),
       home: AnimatedSplashScreen(
           duration: 500,
           splash: SvgPicture.asset(AppImages.eMedLogo,

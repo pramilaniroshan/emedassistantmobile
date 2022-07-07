@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:emedassistantmobile/controller/patientController.dart';
+
 import 'package:emedassistantmobile/screens/book_an_appointment/book_an_appointment_screen.dart';
 import 'package:emedassistantmobile/services/get_patient_profile.dart';
 import 'package:emedassistantmobile/widgets/drawer.dart';
@@ -9,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Trans;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
@@ -124,7 +126,6 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getPatientProfile();
     getAppointments();
