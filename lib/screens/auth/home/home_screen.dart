@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     user = (prefs.getBool('login') ?? false);
     print(prefs.getBool('login'));
-    if (user == false) {
+    if (user == true) {
       Get.to(const MyAppointmentsScreen());
     }
   }
@@ -257,10 +257,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppColors.secondary,
                 ),
               ),
-              title: const Align(
+              title: Align(
                 alignment: Alignment(-1.3, 0),
                 child: Text(
-                  'Support',
+                  'Support'.tr().toString(),
                   style: TextStyle(
                     fontSize: 21.0,
                     color: AppColors.black,
@@ -281,10 +281,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppColors.secondary,
                 ),
               ),
-              title: const Align(
+              title: Align(
                 alignment: Alignment(-1.3, 0),
                 child: Text(
-                  'Contact',
+                  'Contact'.tr().toString(),
                   style: TextStyle(
                     fontSize: 21.0,
                     color: AppColors.black,
@@ -305,10 +305,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppColors.secondary,
                 ),
               ),
-              title: const Align(
+              title: Align(
                 alignment: Alignment(-1.3, 0),
                 child: Text(
-                  'Terms',
+                  'Terms'.tr().toString(),
                   style: TextStyle(
                     fontSize: 21.0,
                     color: AppColors.black,
@@ -399,10 +399,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 fit: BoxFit.cover,
               ),
               const SizedBox(height: 12.0),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(left: 16.0),
                 child: Text(
-                  'Welcome to eMed Assistant',
+                  'hello'.tr().toString() + ' to eMed Assistant',
                   style: TextStyle(
                     fontSize: 20.0,
                     fontWeight: FontWeight.w400,
