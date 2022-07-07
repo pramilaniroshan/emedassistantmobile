@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:emedassistantmobile/models/test_model.dart';
 import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:emedassistantmobile/screens/profile/create_profile_screen.dart';
@@ -7,7 +8,7 @@ import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Trans;
 import 'package:form_validator/form_validator.dart';
 
 import 'package:emedassistantmobile/config/app_colors.dart';
@@ -52,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     user = (prefs.getBool('login') ?? false);
     print(prefs.getBool('login'));
-    if (user == true) {
+    if (user == false) {
       Get.to(const MyAppointmentsScreen());
     }
   }
@@ -353,19 +354,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: AppColors.secondary,
                 ),
               ),
-              title: const Align(
+              title: Align(
                 alignment: Alignment(-1.1, 0),
-                child: Text(
-                  'English',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: AppColors.black,
-                    fontWeight: FontWeight.w400,
-                  ),
+                child: DropdownButton<String>(
+                  value: context.locale.toString() == 'si_LK'
+                      ? 'සිංහල'
+                      : 'English',
+                  onChanged: (String? newValue) async {
+                    if (newValue == 'English') {
+                      await context.setLocale(Locale('en', 'US'));
+                      Get.updateLocale(Locale('en', 'US'));
+                    } else {
+                      await context.setLocale(Locale('si', 'LK'));
+                      Get.updateLocale(Locale('si', 'LK'));
+                    }
+                  },
+                  items: <String>['English', 'සිංහල']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
                 ),
               ),
-              trailing: const Icon(Icons.keyboard_arrow_down_outlined,
-                  color: AppColors.black),
             ),
           ],
         ),

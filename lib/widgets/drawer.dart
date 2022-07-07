@@ -1,7 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Trans;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/app_colors.dart';
@@ -10,20 +11,19 @@ import '../screens/auth/home/home_screen.dart';
 import '../screens/scan_qr/scan_qr_screen.dart';
 
 class PatientDrawer extends StatelessWidget {
-  late SharedPreferences prefs;
+  late final SharedPreferences prefs;
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
     return Drawer(
       backgroundColor: AppColors.white,
       elevation: 0.0,
-      child: endDrawerData(height),
+      child: endDrawerData(height, context),
     );
   }
 
-  Widget endDrawerData(height) => Column(
+  Widget endDrawerData(height, context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -208,20 +208,34 @@ class PatientDrawer extends StatelessWidget {
                 color: AppColors.secondary,
               ),
             ),
-            title: const Align(
+            title: Align(
               alignment: Alignment(-1.1, 0),
-              child: Text(
-                'English',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w400,
-                ),
+              child: DropdownButton<String>(
+                value: EasyLocalization.of(context)?.currentLocale.toString() ==
+                        'si_LK'
+                    ? 'සිංහල'
+                    : 'English',
+                onChanged: (String? newValue) async {
+                  if (newValue == 'English') {
+                    await EasyLocalization.of(context)
+                        ?.setLocale(Locale('en', 'US'));
+                    Get.updateLocale(Locale('en', 'US'));
+                  } else {
+                    await EasyLocalization.of(context)
+                        ?.setLocale(Locale('si', 'LK'));
+                    Get.updateLocale(Locale('si', 'LK'));
+                  }
+                },
+                items: <String>['English', 'සිංහල']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
             ),
-            trailing: const Icon(Icons.keyboard_arrow_down_outlined,
-                color: AppColors.black),
-          ),
+          )
         ],
       );
 }
