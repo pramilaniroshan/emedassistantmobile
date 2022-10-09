@@ -8,9 +8,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart' as lot;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
@@ -36,6 +39,8 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
 
   List doctorlist = [];
 
+ double ? lat;
+ double ? long;
   String? selectedValue;
   List<String> items = [
     'Allergists/Immunologists',
@@ -57,12 +62,19 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
   ];
 
   final Set<Marker> _markers = {};
-  Set<Circle> circles = {};
+
+
+
+/// Location persmisionss
+
+
 
   @override
   void initState() {
     super.initState();
   }
+
+    Set<Circle> circles = {};
 
   void searchDoctor() async {
     EasyLoading.show(status: 'loading...');
@@ -78,7 +90,11 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
           queryParameters: {
             "DoctorName": nameController.text,
             "LocationAddress": locationController.text,
-            //"Date": date,
+            "SpecializationIds" : items.indexOf(selectedValue ?? '') + 1,
+            "Date": date,
+            "LocationLatitude" : lat,
+            "LocationLongitude" : long,
+            "LocationRadius" : lat != null ? 3000 : null
           }).then((res) {
         EasyLoading.dismiss();
         var rdata = res.data['Data']['Data'];
@@ -99,6 +115,8 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
       date = DateTime.now();
       nameController.clear();
       locationController.clear();
+      lat = null;
+      long = null;
     });
   }
 
@@ -246,11 +264,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                         icon: const Icon(Icons.keyboard_arrow_down),
                         hint: const Text(
                           '',
-                          style: TextStyle(
-                            fontSize: 13.0,
-                            color: AppColors.lightBlack,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          
                         ),
                         items: items
                             .map(
@@ -260,28 +274,33 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                                   item,
                                   style: const TextStyle(
                                     fontSize: 15.0,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                    //backgroundColor: Colors.white,
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ),
                             )
                             .toList(),
                         value: selectedValue,
+                        style: TextStyle(color: Colors.white,
+                        //background: Paint(),
+                        ),
                         onChanged: (value) {
                           setState(() {
                             selectedValue = value as String;
                           });
+                          print(selectedValue);
                         },
                         buttonHeight: 40,
                         buttonWidth: 140,
                         itemHeight: 36.0,
-                        dropdownWidth: 150,
+                        dropdownWidth: width/1.5,
                         buttonPadding:
                             const EdgeInsets.symmetric(horizontal: 8.0),
-                        dropdownDecoration: const BoxDecoration(
-                          color: AppColors.lightBlack,
-                        ),
+                        // dropdownDecoration: const BoxDecoration(
+                        //   color: AppColors.lightBlack,
+                        // ),
                       ),
                     ),
                   ),
@@ -307,7 +326,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                       controller: locationController,
                       keyboardType: TextInputType.name,
                       padding: const EdgeInsets.only(bottom: 12.0, left: 16.0),
-                      hintText: '',
+                      hintText: 'Colombo',
                     ),
                   ),
                   Padding(
@@ -316,27 +335,27 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Colombo',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.secondary,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                        SizedBox(width: 12.0),
-                        Text(
-                          'Kandy',
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.secondary,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ],
+                      // children: const [
+                      //   Text(
+                      //     'Colombo',
+                      //     style: TextStyle(
+                      //       fontSize: 16.0,
+                      //       fontWeight: FontWeight.w500,
+                      //       color: AppColors.secondary,
+                      //       decoration: TextDecoration.underline,
+                      //     ),
+                      //   ),
+                      //   SizedBox(width: 12.0),
+                      //   Text(
+                      //     'Kandy',
+                      //     style: TextStyle(
+                      //       fontSize: 16.0,
+                      //       fontWeight: FontWeight.w500,
+                      //       color: AppColors.secondary,
+                      //       decoration: TextDecoration.underline,
+                      //     ),
+                      //   ),
+                      // ],
                     ),
                   ),
 
@@ -434,7 +453,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.5,
+                height: MediaQuery.of(context).size.height * 0.7,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.0),
@@ -443,51 +462,56 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                   borderRadius: BorderRadius.circular(12.0),
                   child: kIsWeb
                       ? Text('Map plugin')
-                      : GoogleMap(
-                          onMapCreated: _onMapCreated,
-                          liteModeEnabled: false,
-                          myLocationButtonEnabled: true,
-                          scrollGesturesEnabled: true,
-                          rotateGesturesEnabled: true,
-                          markers: _markers,
-                          circles: circles,
-                          initialCameraPosition: const CameraPosition(
-                            target: LatLng(6.9271, 79.8612),
-                            zoom: 11,
+                      : Container(
+                        child: GoogleMap(
+                            onMapCreated: _onMapCreated,
+                            liteModeEnabled: false,
+                            myLocationEnabled: true,
+                            myLocationButtonEnabled: true,
+                            scrollGesturesEnabled: true,
+                            rotateGesturesEnabled: true,
+                            markers: _markers,
+                            gestureRecognizers: Set()
+                          ..add(Factory<PanGestureRecognizer>(() => PanGestureRecognizer())),
+                            circles: circles,
+                            initialCameraPosition: const CameraPosition(
+                              target: LatLng(7.93, 80.8612),
+                              zoom: 7.5,
+                            ),
+                            onTap: (latlang) {
+                              setState(() {
+                                lat = latlang.latitude;
+                                long = latlang.longitude;
+                                _markers.add(
+                                  Marker(
+                                      markerId: MarkerId('id-1'),
+                                      position: LatLng(
+                                          latlang.latitude, latlang.longitude),
+                                      infoWindow: InfoWindow(
+                                          title: 'Title',
+                                          snippet: "${latlang.latitude}" +
+                                              "${latlang.longitude}")),
+                                );
+                                circles.add(Circle(
+                                    circleId: CircleId('id-1'),
+                                    center: LatLng(
+                                        latlang.latitude , latlang.longitude),
+                                    radius: 3000,
+                                    fillColor: AppColors.lightBlue.withOpacity(0.5),
+                                    strokeWidth: 3,
+                                    strokeColor: AppColors.lightBlue,
+                                    ));
+                              });
+                              
+                            },
                           ),
-                          onTap: (latlang) {
-                            setState(() {
-                              _markers.add(
-                                Marker(
-                                    markerId: MarkerId('id-1'),
-                                    position: LatLng(
-                                        latlang.latitude, latlang.longitude),
-                                    infoWindow: InfoWindow(
-                                        title: 'Title',
-                                        snippet: "${latlang.latitude}" +
-                                            "${latlang.longitude}")),
-                              );
-                            });
-                            Set.from([
-                              Circle(
-                                  circleId: CircleId('id-1'),
-                                  center: LatLng(
-                                      latlang.latitude, latlang.longitude),
-                                  radius: 4000,
-                                  fillColor: Colors.red)
-                            ]);
-                          },
-                        ),
+                      ),
                 ),
               ),
             ),
             doctorlist.isEmpty
-                ? const Center(
-                    child: Text(
-                    'No any Data to display...',
-                    style: TextStyle(
-                        color: AppColors.redColor, fontWeight: FontWeight.bold),
-                  ))
+                ?  Center(
+                    child: lot.Lottie.network('https://assets9.lottiefiles.com/packages/lf20_QYZUuR.json'))
                 : Column(
                     children: List.generate(
                         doctorlist.length,
