@@ -13,6 +13,9 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart' hide Trans;
 import 'package:intl/intl.dart';
+import 'package:open_settings/open_settings.dart';
+
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:add_2_calendar/add_2_calendar.dart';
@@ -71,6 +74,17 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     });
   }
 
+  void checkPermissons() async {
+    var status = await Permission.location.status;
+    if (status.isDenied) {
+      EasyLoading.showInfo("Please enble location services");
+    }
+
+// You can can also directly ask the permission about its status.
+    if (await Permission.location.isRestricted) {}
+    if (status.isGranted) {}
+  }
+
   Future<void> getAppointments() async {
     EasyLoading.showInfo('status');
     appointments.clear();
@@ -85,6 +99,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
         Constants().getBaseUrl() + '/Patient/Appointment',
       )
           .then((res) {
+        print(res.data['Data']['Data']);
         setState(() {
           appointments = res.data['Data']['Data'];
         });
@@ -95,12 +110,6 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
       EasyLoading.dismiss();
       //print(e.response!.statusCode);
     }
-  }
-
-  void appointmentsDelete() {
-    print('confirm');
-    Get.back();
-    EasyLoading.showSuccess('Done');
   }
 
   Future<bool> _onWillPop() async {
@@ -129,6 +138,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     super.initState();
     getPatientProfile();
     getAppointments();
+    checkPermissons();
   }
 
   @override
@@ -336,25 +346,35 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
                             return DoctorDetailsBox(
                               width: width,
                               id: appointments[index]['DoctorAvailability']
-                                  ['Doctor']['Id'],
+                                      ['Doctor']['Id'] ??
+                                  '',
                               title: appointments[index]['DoctorAvailability']
-                                  ['Doctor']['Title'],
+                                      ['Doctor']['Title'] ??
+                                  '',
                               fullName: appointments[index]
-                                  ['DoctorAvailability']['Doctor']['FullName'],
+                                          ['DoctorAvailability']['Doctor']
+                                      ['FullName'] ??
+                                  '',
                               phoneNumber: appointments[index]
-                                      ['DoctorAvailability']['Doctor']
-                                  ['PhoneNumber'],
+                                          ['DoctorAvailability']['Doctor']
+                                      ['PhoneNumber'] ??
+                                  '',
                               locationAddress: appointments[index]
-                                      ['DoctorAvailability']['Location']
-                                  ['LocationAddress'],
+                                          ['DoctorAvailability']['Location']
+                                      ['LocationAddress'] ??
+                                  '',
                               locationName: appointments[index]
-                                      ['DoctorAvailability']['Location']
-                                  ['LocationName'],
+                                          ['DoctorAvailability']['Location']
+                                      ['LocationName'] ??
+                                  '',
                               startTime: appointments[index]
-                                  ['DoctorAvailability']['StartTime'],
+                                      ['DoctorAvailability']['StartTime'] ??
+                                  '',
                               endTime: appointments[index]['DoctorAvailability']
-                                  ['EndTime'],
-                              patientNotes: appointments[index]['PatientNotes'],
+                                      ['EndTime'] ??
+                                  '',
+                              patientNotes:
+                                  appointments[index]['PatientNotes'] ?? '',
                             );
                           },
                         ),
@@ -450,8 +470,31 @@ class DoctorDetailsBox extends StatelessWidget {
     return dayList;
   }
 
+  appointmentsDelete() async {
+      prefs = await SharedPreferences.getInstance();
+      String token = prefs.getString("token") ?? '';
+      try {
+        var dio = Dio();
+        dio.options.headers["authorization"] = "Bearer " + token;
+        await dio.post(Constants().getBaseUrl() + '/Patient/Appointment/Cancel',
+            data: {"AppointmentId": id} ).then((res) {
+          //print(res.data['Data']['Data']);
+          EasyLoading.dismiss();
+          EasyLoading.showSuccess('Done');
+          //print(appointments[0]['DoctorAvailability']['Doctor']);
+        });
+      } on DioError catch (e) {
+        EasyLoading.dismiss();
+        //print(e.response!.statusCode);
+      }
+    }
+
   @override
   Widget build(BuildContext context) {
+
+
+    
+
     return Container(
       width: width,
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
@@ -672,13 +715,15 @@ class DoctorDetailsBox extends StatelessWidget {
                   child: IconButton(
                       onPressed: () {
                         Get.defaultDialog(
-                            title: "Confirm",
+                            title: "Are you sure?",
                             middleText: "Please Confirm",
+                            confirmTextColor: Colors.red,
                             onConfirm: () {
-                              //appointmentsDelete();
+                              appointmentsDelete();
+                              print('--------------------------------------------------------------------');
                             },
                             onCancel: () {
-                              print('cancel');
+                              Get.back();
                             });
                       },
                       icon: Icon(Icons.delete,
