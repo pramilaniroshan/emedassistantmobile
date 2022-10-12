@@ -99,7 +99,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
         Constants().getBaseUrl() + '/Patient/Appointment',
       )
           .then((res) {
-        print(res.data['Data']['Data']);
+        //print(res.data['Data']['Data']);
         setState(() {
           appointments = res.data['Data']['Data'];
         });
@@ -466,11 +466,12 @@ class DoctorDetailsBox extends StatelessWidget {
     String createdDate = dateFormat.format(DateTime.parse(localDate));
     // you will local time
     List<String> dayList = createdDate.split(",");
-    print(dayList);
+   // print(dayList);
     return dayList;
   }
 
   appointmentsDelete() async {
+    EasyLoading.show();
       prefs = await SharedPreferences.getInstance();
       String token = prefs.getString("token") ?? '';
       try {
@@ -478,10 +479,11 @@ class DoctorDetailsBox extends StatelessWidget {
         dio.options.headers["authorization"] = "Bearer " + token;
         await dio.post(Constants().getBaseUrl() + '/Patient/Appointment/Cancel',
             data: {"AppointmentId": id} ).then((res) {
-          //print(res.data['Data']['Data']);
+          
           EasyLoading.dismiss();
+          Get.back();
           EasyLoading.showSuccess('Done');
-          //print(appointments[0]['DoctorAvailability']['Doctor']);
+         
         });
       } on DioError catch (e) {
         EasyLoading.dismiss();
@@ -717,13 +719,13 @@ class DoctorDetailsBox extends StatelessWidget {
                         Get.defaultDialog(
                             title: "Are you sure?",
                             middleText: "Please Confirm",
-                            confirmTextColor: Colors.red,
+                            confirmTextColor: Colors.white,
                             onConfirm: () {
                               appointmentsDelete();
-                              print('--------------------------------------------------------------------');
+                             // print('--------------------------------------------------------------------');
                             },
                             onCancel: () {
-                              Get.back();
+                              Get.to(MyAppointmentsScreen());
                             });
                       },
                       icon: Icon(Icons.delete,
@@ -731,17 +733,17 @@ class DoctorDetailsBox extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16.0),
-              Container(
-                height: 42.0,
-                width: 42.0,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.secondary,
-                ),
-                child: const Center(
-                  child: Icon(Icons.edit, color: AppColors.white, size: 18.0),
-                ),
-              ),
+              // Container(
+              //   height: 42.0,
+              //   width: 42.0,
+              //   decoration: const BoxDecoration(
+              //     shape: BoxShape.circle,
+              //     color: AppColors.secondary,
+              //   ),
+              //   // child: const Center(
+              //   //   child: Icon(Icons.edit, color: AppColors.white, size: 18.0),
+              //   // ),
+              // ),
             ],
           ),
         ],

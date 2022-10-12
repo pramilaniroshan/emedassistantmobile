@@ -26,6 +26,6 @@ void getPatientProfile() async {
       }
     });
   } on DioError catch (e) {
-    print(e.response!.data);
+    print(e.response!.data ?? 'Something went wrong!');
   }
 }

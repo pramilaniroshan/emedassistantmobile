@@ -1,5 +1,6 @@
 import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:emedassistantmobile/widgets/custom_button.dart';
+import 'package:emedassistantmobile/widgets/drawer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -12,6 +13,7 @@ import 'package:emedassistantmobile/config/app_colors.dart';
 import 'package:emedassistantmobile/config/app_images.dart';
 
 import '../../config/constants.dart';
+import '../../widgets/user_avatar.dart';
 
 class PatientBookingScreen extends StatefulWidget {
   final String? dayText;
@@ -94,15 +96,9 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
           child: SvgPicture.asset(AppImages.eMedLogo),
         ),
         leadingWidth: 110.0,
-        actions: [
-          menuButton(),
-        ],
+        actions:[PatientDrawerAction()],
       ),
-      endDrawer: Drawer(
-        backgroundColor: AppColors.white,
-        elevation: 0.0,
-        child: endDrawerData(height),
-      ),
+      endDrawer: PatientDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -271,14 +267,14 @@ class _PatientBookingScreenState extends State<PatientBookingScreen> {
                                   ],
                                 ),
                               ),
-                              const Text(
-                                '6° slot',
-                                style: TextStyle(
-                                  fontSize: 22.0,
-                                  color: AppColors.secondary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              )
+                              // const Text(
+                              //   '',
+                              //   style: TextStyle(
+                              //     fontSize: 22.0,
+                              //     color: AppColors.secondary,
+                              //     fontWeight: FontWeight.w600,
+                              //   ),
+                              // )
                             ],
                           ),
                         ),

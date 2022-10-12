@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:emedassistantmobile/screens/my_appointments/my_appointment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
@@ -42,10 +43,37 @@ class PatientDrawer extends StatelessWidget {
           const SizedBox(height: 20.0),
           ListTile(
             onTap: () {
-              Get.to(QRViewExample());
+              Get.to(MyAppointmentsScreen());
             },
             leading: Padding(
               padding: const EdgeInsets.only(top: 6.0, left: 12.0),
+              child: SvgPicture.asset(
+                AppImages.supportIcon,
+                height: 13.0,
+                width: 13.0,
+                fit: BoxFit.scaleDown,
+                color: AppColors.secondary,
+              ),
+            ),
+            title: const Align(
+              alignment: Alignment(-2.0, 0),
+              child: Text(
+                'My Appointments',
+                style: TextStyle(
+                  fontSize: 21.0,
+                  color: AppColors.black,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+          //const SizedBox(height: 20.0),
+          ListTile(
+            onTap: () {
+              Get.to(QRViewExample());
+            },
+            leading: Padding(
+              padding: const EdgeInsets.only(top: 3.0, left: 12.0),
               child: SvgPicture.asset(
                 AppImages.supportIcon,
                 height: 13.0,

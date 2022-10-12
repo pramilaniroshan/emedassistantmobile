@@ -87,10 +87,18 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
       dio.options.headers["authorization"] = "Bearer " + token;
       await dio.get(
           Constants().getBaseUrl() + '/Patient/SearchDoctorAvailability',
-          queryParameters: {
+          
+          queryParameters: selectedValue != null ?{
             "DoctorName": nameController.text,
             "LocationAddress": locationController.text,
             "SpecializationIds" : items.indexOf(selectedValue ?? '') + 1,
+            "Date": date,
+            "LocationLatitude" : lat,
+            "LocationLongitude" : long,
+            "LocationRadius" : lat != null ? 3000 : null
+          }: {
+            "DoctorName": nameController.text,
+            "LocationAddress": locationController.text,
             "Date": date,
             "LocationLatitude" : lat,
             "LocationLongitude" : long,
@@ -117,6 +125,8 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
       locationController.clear();
       lat = null;
       long = null;
+      selectedValue = null;
+      doctorlist.clear();
     });
   }
 
@@ -409,47 +419,7 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                       ),
                     ),
                   ),
-
-                  /// Search Button
-                  const SizedBox(height: 32.0),
-                  ListTile(
-                    title: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: CustomButton(
-                            onTap: () {
-                              searchDoctor();
-                              /*Get.dialog(
-                          const ScheduleSlotDialog(),
-                        );*/
-                              // Get.dialog(
-                              //   const DoctorAvailabilityDialog(),
-                              // );
-                            },
-                            btnText: 'Search',
-                            width: 90.0,
-                            height: 36.0,
-                          ),
-                        ),
-                        const SizedBox(width: 30),
-                        Expanded(
-                          child: CustomButton(
-                              btnText: 'Clear',
-                              btnColor: AppColors.lightBackground,
-                              fontColor: AppColors.lightBlack,
-                              width: 90.0,
-                              height: 36.0,
-                              onTap: (() => {clearForm()})),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-
-            /// Search Result List
-            Padding(
+                      Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Container(
@@ -509,11 +479,59 @@ class _BookAnAppointmentScreenState extends State<BookAnAppointmentScreen> {
                 ),
               ),
             ),
+
+                  /// Search Button
+                  const SizedBox(height: 32.0),
+                  ListTile(
+                    title: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: CustomButton(
+                            onTap: () {
+                              searchDoctor();
+                              /*Get.dialog(
+                          const ScheduleSlotDialog(),
+                        );*/
+                              // Get.dialog(
+                              //   const DoctorAvailabilityDialog(),
+                              // );
+                            },
+                            btnText: 'Search',
+                            width: 90.0,
+                            height: 36.0,
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        Expanded(
+                          child: CustomButton(
+                              btnText: 'Clear',
+                              btnColor: AppColors.lightBackground,
+                              fontColor: AppColors.lightBlack,
+                              width: 90.0,
+                              height: 36.0,
+                              onTap: (() => {clearForm()})),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+
+            /// Search Result List
+        const SizedBox(height: 32.0),
             doctorlist.isEmpty
-                ?  Center(
-                    child: lot.Lottie.network('https://assets9.lottiefiles.com/packages/lf20_QYZUuR.json'))
+                ?  Stack(
+                  alignment: AlignmentDirectional.bottomStart,
+                  children: [
+                       Image.asset(AppImages.noResultImage ,semanticLabel: "No results found.",),
+                       Center(child: Text('No results found.'),)
+          ])
                 : Column(
-                    children: List.generate(
+                  
+                    children: 
+                   
+                    List.generate(
                         doctorlist.length,
                         (index) => SearchDoctorBox(
                             doctorlist[index]["IanaTimeZoneId"],
