@@ -46,10 +46,12 @@ class _QRViewExampleState extends State<QRViewExample> {
       dio.options.headers["authorization"] = "Bearer " + token;
       if (qr != null) {
         EasyLoading.show(status: 'loading...');
-        Map<String, dynamic> doctor_av = jsonDecode(qr!.code ?? '');
-        await dio
+        
+Map<String, dynamic> doctor_av = jsonDecode(qr.code ?? '');
+        if (doctor_av.containsKey('Id') == true){
+                  await dio
             .post(Constants().getBaseUrl() + '/Patient/AppointmentQr', data: {
-          "DoctorAvailabilityId": doctor_av['Id'],
+          "DoctorAvailabilityId": doctor_av['Id'] ,
         }).then((res) {
           EasyLoading.showSuccess('Done');
 
@@ -57,6 +59,10 @@ class _QRViewExampleState extends State<QRViewExample> {
             Get.to(const MyAppointmentsScreen());
           });
         });
+        }
+        else{
+          EasyLoading.showError('scan a valid QR!');
+        }
       }
     } on DioError catch (e) {
       EasyLoading.dismiss();
@@ -64,6 +70,8 @@ class _QRViewExampleState extends State<QRViewExample> {
       Future.delayed(const Duration(seconds: 2), () {
         Get.to(const MyAppointmentsScreen());
       });
+    } catch (FormatException , e) {
+      EasyLoading.showError('scan a valid QR!' );
     }
   }
 
