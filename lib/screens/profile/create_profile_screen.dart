@@ -37,7 +37,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   List<String> items = ['Mr', 'Mrs', 'Ms', 'Miss'];
 
   String? cCode = '+94';
-  List<String> cCodes = ['+94', '+91'];
+  List<String> cCodes = ['+94', '+91', '+39'];
+   final country_code_map = {210 : "+94", 111 : "+39",};
 
   FToast? fToast;
   late SharedPreferences prefs;
@@ -54,7 +55,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         "Email": emailController.text,
         "PhoneNumber": cCode! + mobileNumberController.text,
         "RegisterType": 0,
-        "CountryCode": 210,
+        "CountryCode": country_code_map.keys.firstWhere((k) => country_code_map[k] == cCode, orElse: () => null ?? 210),
         "Address": addressController.text
       }).then((res) {
         if (res.statusCode == 200) {
@@ -125,7 +126,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           .post(Constants().getBaseUrl() + '/Authentication/Login-init', data: {
         "Username": emailController.text,
         "UserLoginType": 1,
-        "CountryCode": 210,
+        "CountryCode": country_code_map.keys.firstWhere((k) => country_code_map[k] == cCode, orElse: () => null ?? 210),
         "Application": 0
       }).then((res) {
         if (res.statusCode == 200) {
@@ -575,19 +576,19 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                   child: DropdownButton2(
                                     icon: const Icon(Icons.keyboard_arrow_down),
                                     hint: const Text(
-                                      ' +94',
+                                      ' +39',
                                       style: TextStyle(
                                         fontSize: 13.0,
                                         fontWeight: FontWeight.w500,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
-                                    items: cCodes
+                                    items: country_code_map.entries
                                         .map(
                                           (item) => DropdownMenuItem<String>(
-                                            value: item,
+                                            value: item.value,
                                             child: Text(
-                                              item,
+                                              item.value,
                                               style: const TextStyle(
                                                 fontSize: 15.0,
                                                 color: AppColors.lightBlack,
@@ -600,8 +601,11 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                     value: cCode,
                                     onChanged: (value) {
                                       setState(() {
-                                        cCode = value as String;
+                                        cCode = value;
                                       });
+                                      var key = country_code_map.keys.firstWhere((k) => country_code_map[k] == cCode, orElse: () => null ?? 0);
+                                      print(cCode);
+                                      print(key);
                                     },
                                     buttonHeight: 40,
                                     buttonWidth: 140,
